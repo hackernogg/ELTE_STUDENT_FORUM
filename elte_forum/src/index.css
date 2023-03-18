@@ -48,3 +48,54 @@
   color: #f13593;
   margin-bottom: 8px;
 }
+
+/* login and register css*/
+.loginReg {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 20px;
+  background-color: #c2c2c2;
+  border-radius: 25px;
+}
+.loginReg h1{
+  color: #b235f1;
+}
+.loginReg h2{
+  color: #f1359c;
+}
+
+.loginReg .registration{
+  display: flex;
+  flex-direction: column;
+}
+
+.loginReg .login{
+  display: flex;
+  flex-direction: column;
+}
+
+input[type="text"],
+input[type="password"] {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  box-sizing: border-box;
+  border: 2px solid #ccc;
+  border-radius: 25px;
+  font-size: 16px;
+}
+
+.loginReg button {
+  width: 100%;
+  margin: 10px auto;
+  background-color: #af4ca0;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+.loginReg button:hover {
+  background-color: #8e3e56;
+}

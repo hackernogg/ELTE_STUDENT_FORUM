@@ -1,80 +1,23 @@
 import Navbar from './Navbar';
 import Home from './Home';
+import LoginReg from './LoginReg';
 import React, { useState } from 'react';
-import Axios from 'axios';
 
 
 function App() {
-  const [usernameReg, setUsernameReg] = useState("");
-  const [passwordReg, setPasswordReg] = useState("");
-
+  const [loginStatus, setloginStatus] = useState("");
   const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-
-  const [loginStatus, setLoginStatus] = useState("Need to Login");
-
-  const register =()=>{
-    Axios.post("http://localhost:3001/register",{
-      username: usernameReg, 
-      password: passwordReg
-    }).then((response)=>{
-      console.log(response);
-    });
-  };
-
-  const login =()=>{
-    if (!username || !password) {
-      setLoginStatus("Please enter both username and password.");
-      return;
-    }
-    Axios.post("http://localhost:3001/login",{
-      username: username, 
-      password: password
-    }).then((response)=>{
-      if(response.data.message){
-        setLoginStatus(response.data.message);
-      }else{
-        setLoginStatus(response.data[0].user_name);
-      }
-    });
+  const handleChildData = (data1,data2) => {
+    setloginStatus(data1);
+    setUsername(data2);
   };
   return (
     <div className="App">
-      <div className='registration'>
-        <h1>Registration</h1>
-        <label>Username</label>
-        <input type = "text"
-          onChange={(e)=> {
-            setUsernameReg(e.target.value);
-          }}
-          />
-        <label>Password</label>
-        <input type = "text"
-          onChange={(e)=> {
-            setPasswordReg(e.target.value);
-          }}
-        />
-        <button onClick={register}> Register </button>
-      </div>
+      {(loginStatus === '' ||loginStatus != username) &&(
+        <LoginReg onChildData={handleChildData}/>
+      )}
 
-
-
-      <div className='login'>
-        <h1>Login</h1>
-        <input type="text" placeholder="Usename..." 
-          onChange={(e)=> {
-            setUsername(e.target.value);
-          }}
-        />
-        <input type="password" placeholder="Password..."
-          onChange={(e)=> {
-            setPassword(e.target.value);
-          }}
-        />
-        <button onClick={login}> Login </button>
-      </div>
-
-      {loginStatus === username && (
+      {(loginStatus === username && loginStatus != "" )&& (
         <div>
           <Navbar username={username}/>
           <div className='content'>
@@ -84,7 +27,6 @@ function App() {
         </div>
       )}
       
-      <h1>{loginStatus}</h1>
     </div>
   );
 }
