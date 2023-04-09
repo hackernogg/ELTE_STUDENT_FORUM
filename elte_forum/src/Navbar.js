@@ -1,5 +1,14 @@
+import React from "react";
+
 const Navbar = (props) => {
     const username = props.username;
+
+    const logout = () => {
+        localStorage.removeItem("isLoggedIn");
+        localStorage.removeItem("loggedInUsername");
+        window.location.reload();
+      };
+
     return (  
         <nav className="navbar">
             <h1>ELTE Student Forum</h1>
@@ -11,6 +20,7 @@ const Navbar = (props) => {
                     backgroundColor: '#b235f1',
                     borderRadius: '8px'
                 }}>{username}</a>
+                <button className="logout-button" onClick={logout} >→</button>
             </div>
         </nav>
     );

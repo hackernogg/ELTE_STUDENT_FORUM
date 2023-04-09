@@ -28,6 +28,23 @@
 .navbar a:hover {
   color: #f1356d;
 }
+
+.navbar .logout-button {
+  border: none;
+  background-color: transparent;
+  color: #333;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-left: 8px;
+  padding: 5px 10px;
+  border-radius: 10px;
+  transition: all 0.3s;
+}
+
+.navbar .logout-button:hover {
+  background-color: #f1f1f1;
+}
 .content {
   max-width: 600px;
   margin: 40px auto;
@@ -99,3 +116,4 @@ input[type="password"] {
 .loginReg button:hover {
   background-color: #8e3e56;
 }
+
