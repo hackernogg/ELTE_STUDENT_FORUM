@@ -2,6 +2,7 @@ const express = require("express");
 const mysql = require("mysql");
 const cors = require("cors");
 
+
 const app = express();
 
 app.use(express.json());
@@ -43,6 +44,47 @@ app.post('/login', (req,res)=>{
             }
         });
 });
+
+app.get("/posts", (req, res) => {
+    db.query("SELECT * FROM posts", (err, result) => {
+      if (err) {
+        console.error("Error fetching posts:", err);
+        res.status(500).send("Error fetching posts");
+      } else {
+        res.json(result);
+      }
+    });
+  });
+  
+  app.get("/posts/:post_id", (req, res) => {
+    const postId = req.params.post_id;
+    console.log(postId)
+    db.query("SELECT * FROM posts WHERE post_id = ?", [postId], (err, result) => {
+      if (err) {
+        console.error("Error fetching post:", err);
+        res.status(500).send("Error fetching post");
+      } else {
+        res.json(result[0]); // Send the first result (should be the only one)
+      }
+    });
+  });
+
+  app.post('/createPost', (req, res) => {
+    const { title, content, postType, user_id, user_name } = req.body;
+  
+    db.query(
+      "INSERT INTO posts (title, content, user_id, user_name) VALUES (?, ?, ?, ?)",
+      [title, content, user_id, user_name],
+      (err, result) => {
+        if (err) {
+          console.error("Error creating post:", err);
+          res.status(500).send("Error creating post");
+        } else {
+          res.json({ message: "Post created successfully" });
+        }
+      }
+    );
+  });
 
 app.listen(3001,()=>{
     console.log("running server");

@@ -46,6 +46,7 @@ const LoginReg = (props) => {
         setLoginStatus(response.data[0].user_name);
         localStorage.setItem("isLoggedIn", true);
         localStorage.setItem("loggedInUsername", response.data[0].user_name);
+        props.onChildData(response.data[0].user_name, response.data[0].user_name, response.data[0].user_id); // Pass the user_id as the third argument
       }
     });
   };

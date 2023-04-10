@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from 'react-router-dom';
 
 const Navbar = (props) => {
     const username = props.username;
@@ -15,12 +16,15 @@ const Navbar = (props) => {
             <div className="links">
                 <a href="/">Forum</a>
                 <a href="/market">Market</a>
+                <Link to="/createPost">
+                    <button className="logout-button">+</button>
+                </Link>
                 <a href="/creat" style={{
                     color:  "white",
                     backgroundColor: '#b235f1',
                     borderRadius: '8px'
                 }}>{username}</a>
-                <button className="logout-button" onClick={logout} >→</button>
+                <button className="logout-button" onClick={logout} >➮</button>
             </div>
         </nav>
     );
