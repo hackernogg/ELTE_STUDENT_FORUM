@@ -24,7 +24,7 @@ const BlogDetails = () => {
           <h2>{blog.title}</h2>
           <p>Written by {blog.user_name}</p>
           <p>Created time {blog.created_time}</p>
-          <div dangerouslySetInnerHTML={{ __html: blog.content }}></div>
+          <div className="blog-content" dangerouslySetInnerHTML={{ __html: blog.content }}></div>
         </>
       ) : (
         <div>Loading...</div>

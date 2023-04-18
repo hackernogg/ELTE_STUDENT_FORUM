@@ -117,3 +117,12 @@ input[type="password"] {
   background-color: #8e3e56;
 }
 
+.blog-content {
+  width: 100%;
+  max-width: 600px; /* Adjust this to the desired maximum width */
+}
+
+.blog-content img {
+  max-width: 100%;
+}
+
