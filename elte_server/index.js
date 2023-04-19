@@ -3,9 +3,11 @@ const mysql = require("mysql");
 const cors = require("cors");
 const multer = require('multer');
 const path = require('path');
+const bcrypt = require('bcrypt');
 //this V
 
 const app = express();
+const saltRounds = 10;
 
 app.use(express.json());
 app.use(cors());
@@ -18,50 +20,88 @@ const db = mysql.createConnection({
     password: "87694748",
     database: "elte_forum_db"
 });
-app.post('/register',(req, res)=>{
 
-    const userid = req.body.userid;
-    const username = req.body.username;
-    const password = req.body.password;
-    db.query(
+app.post('/register',(req, res)=>{
+  const userid = req.body.userid;
+  const username = req.body.username;
+  const password = req.body.password;
+  
+  bcrypt.hash(password, saltRounds, (err, hash) => {
+    if (err) {
+      console.log(err);
+      res.send({ message: "Error hashing password" });
+    } else {
+      db.query(
         "INSERT INTO users (user_id, user_name, user_pwd) VALUES (?, ?, ?)",
-        [userid, username, password], 
+        [userid, username, hash],
         (err,result)=>{
-            console.log(err);
-            if (err){
-              res.send({message: "This user id has already been used, please re-enter a new one."});
-            }else{
-              res.send(result);
-            }
-        });
+          console.log(err);
+          if (err){
+            res.send({message: "This user id has already been used, please re-enter a new one."});
+          }else{
+            res.send(result);
+          }
+        }
+      );
+    }
+  });
 });
 
 app.post('/login', (req,res)=>{
-    const userid = req.body.userid;
-    const password = req.body.password;
-    db.query(
-        "SELECT * FROM users WHERE user_id = ? AND user_pwd = ?",
-        [userid, password], 
-        (err,result)=>{
-            if (err){
-                res.send({err: err});
-            }
-
-            if (result.length > 0){
-                res.send(result);
-            } else{
-                res.send({message: "Wrong userid/password combination!"});
-            }
+  const userid = req.body.userid;
+  const password = req.body.password;
+  db.query(
+    "SELECT * FROM users WHERE user_id = ?",
+    [userid],
+    (err,result)=>{
+      if (err){
+        res.send({err: err});
+      }
+      if (result.length > 0){
+        bcrypt.compare(password, result[0].user_pwd, (err, isMatch) => {
+          if (err) {
+            console.log(err);
+            res.send({ message: "Error comparing password" });
+          }
+          if (isMatch) {
+            res.send(result);
+          } else {
+            res.send({ message: "Wrong userid/password combination!" });
+          }
         });
+      } else {
+        res.send({ message: "Wrong userid/password combination!" });
+      }
+    }
+  );
 });
 
 app.get("/posts", (req, res) => {
-    db.query("SELECT * FROM posts", (err, result) => {
+  const page = req.query.page;
+  const pageSize = req.query.pageSize;
+  console.log(page);
+  console.log(pageSize);
+  const realpageSize = pageSize * 1;
+  const offset = page * pageSize;
+  db.query("SELECT * FROM posts LIMIT ? OFFSET ?",
+  [realpageSize, offset],(err, result) => {
+    if (err) {
+    console.error("Error fetching posts:", err);
+    res.status(500).send("Error fetching posts");
+    } else {
+      res.json(result);
+    }
+    }
+    );
+  });
+
+  app.get("/posts/count", (req, res) => {
+    db.query("SELECT COUNT(*) AS count FROM posts", (err, result) => {
       if (err) {
-        console.error("Error fetching posts:", err);
-        res.status(500).send("Error fetching posts");
+        console.error("Error fetching post count:", err);
+        res.status(500).send("Error fetching post count");
       } else {
-        res.json(result);
+        res.json(result[0]);
       }
     });
   });
