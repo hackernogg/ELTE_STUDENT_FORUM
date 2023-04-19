@@ -20,29 +20,49 @@
 .navbar .links {
   margin-left: auto;
 }
-.navbar a {
-  margin-left: 16px;
+
+.navbar .username{
+  color:  white;
+  background-color: #b235f1;
+  margin-left: 14px;
+  margin-right: 14px;
   text-decoration: none;
   padding: 6px;
-}
-.navbar a:hover {
-  color: #f1356d;
-}
-
-.navbar .logout-button {
-  border: none;
-  background-color: transparent;
-  color: #333;
-  font-size: 18px;
-  font-weight: bold;
-  cursor: pointer;
-  margin-left: 8px;
-  padding: 5px 10px;
   border-radius: 10px;
   transition: all 0.3s;
 }
+.navbar .username:hover {
+  color:  #f1356d;
+  background-color: #f1f1f1;
+}
+
+.navbar .type{
+  margin-right: 16px;
+  text-decoration: none;
+  padding: 6px;
+  border-radius: 10px;
+  font-weight: bold;
+  transition: all 0.3s;
+}
+.navbar .type:hover{
+  color: #f1356d;
+  background-color: #f1f1f1;
+}
+
+
+.navbar .logout-button {
+  background-color: transparent;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 10px;
+  transition: all 0.3s;
+  text-align: center;
+}
 
 .navbar .logout-button:hover {
+  color: #f1356d;
   background-color: #f1f1f1;
 }
 .content {

@@ -7,23 +7,19 @@ const Navbar = (props) => {
     const logout = () => {
         localStorage.removeItem("isLoggedIn");
         localStorage.removeItem("loggedInUsername");
-        window.location.reload();
+        window.location.href = "/";
       };
 
     return (  
         <nav className="navbar">
             <h1>ELTE Student Forum</h1>
             <div className="links">
-                <a href="/">Forum</a>
-                <a href="/market">Market</a>
+                <a className="type" href="/">Forum</a>
+                <a className="type" href="/market">Market</a>
                 <Link to="/createPost">
                     <button className="logout-button">+</button>
                 </Link>
-                <a href="/creat" style={{
-                    color:  "white",
-                    backgroundColor: '#b235f1',
-                    borderRadius: '8px'
-                }}>{username}</a>
+                <a href="/creat" className="username">{username}</a>
                 <button className="logout-button" onClick={logout} >➮</button>
             </div>
         </nav>

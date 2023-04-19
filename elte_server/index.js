@@ -20,22 +20,28 @@ const db = mysql.createConnection({
 });
 app.post('/register',(req, res)=>{
 
+    const userid = req.body.userid;
     const username = req.body.username;
     const password = req.body.password;
     db.query(
-        "INSERT INTO users (user_name, user_pwd, user_profile_pic_index) VALUES (?, ?, 1)",
-        [username, password], 
+        "INSERT INTO users (user_id, user_name, user_pwd) VALUES (?, ?, ?)",
+        [userid, username, password], 
         (err,result)=>{
             console.log(err);
+            if (err){
+              res.send({message: "This user id has already been used, please re-enter a new one."});
+            }else{
+              res.send(result);
+            }
         });
 });
 
 app.post('/login', (req,res)=>{
-    const username = req.body.username;
+    const userid = req.body.userid;
     const password = req.body.password;
     db.query(
-        "SELECT * FROM users WHERE user_name = ? AND user_pwd = ?",
-        [username, password], 
+        "SELECT * FROM users WHERE user_id = ? AND user_pwd = ?",
+        [userid, password], 
         (err,result)=>{
             if (err){
                 res.send({err: err});
@@ -44,7 +50,7 @@ app.post('/login', (req,res)=>{
             if (result.length > 0){
                 res.send(result);
             } else{
-                res.send({message: "Wrong username/password combination!"});
+                res.send({message: "Wrong userid/password combination!"});
             }
         });
 });
