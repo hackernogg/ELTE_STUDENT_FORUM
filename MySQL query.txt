@@ -30,3 +30,10 @@ CREATE TABLE replies (
 
 pm2 stop all
 pm2 restart index.js
+
+ubuntu
+mysql -u root -p
+
+sudo systemctl start nginx 
+sudo systemctl stop nginx 
+sudo systemctl restart nginx
