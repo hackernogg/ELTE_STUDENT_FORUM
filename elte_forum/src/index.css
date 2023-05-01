@@ -75,17 +75,32 @@
 .blog-preview {
   padding: 10px 16px;
   margin: 20px 0;
-  border-bottom: 1px solid #fafafa;
+  border: 1px solid #ddd; /* Add border */
+  border-radius: 4px; /* Optional: Add border radius */
+  transition: box-shadow 0.3s; /* Add transition for hover effect */
 }
+
 .blog-preview:hover {
-  box-shadow: 1px 3px 5px rgba(0,0,0,0.1);
+  box-shadow: 1px 3px 5px rgba(0, 0, 0, 0.1);
+  background-color: #f9f9f9;
 }
+
 .blog-preview h2 {
   font-size: 20px;
   color: #f13593;
   margin-bottom: 8px;
 }
 
+.preview-info {
+  display: flex;
+  justify-content: flex-end;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.preview-info p {
+  margin: 4px 0;
+}
 /* login and register css*/
 .loginReg {
   max-width: 600px;
@@ -146,3 +161,37 @@ input[type="password"] {
   max-width: 100%;
 }
 
+/*page bar*/
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.pagination button {
+  background-color: transparent;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 10px;
+  transition: all 0.3s;
+  text-align: center;
+}
+
+.pagination button:hover {
+  color: #f1356d;
+  background-color: #f1f1f1;
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination span {
+  margin: 0 10px;
+  font-weight: bold;
+}

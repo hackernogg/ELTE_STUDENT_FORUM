@@ -77,39 +77,74 @@ app.post('/login', (req,res)=>{
 });
 
 app.get("/posts", (req, res) => {
-  const page = req.query.page;
-  const pageSize = req.query.pageSize;
-  console.log(page);
-  console.log(pageSize);
-  const realpageSize = pageSize * 1;
+  const page = req.query.page || 0;
+  const pageSize = req.query.pageSize || 7;
+  const category = req.query.category || "";
+  const sort = req.query.sort || "newest";
+  const user_id = req.query.user_id || "";
+  const searchTitle = req.query.searchTitle || "";
+  const realPageSize = pageSize * 1;
   const offset = page * pageSize;
-  db.query("SELECT * FROM posts LIMIT ? OFFSET ?",
-  [realpageSize, offset],(err, result) => {
-    if (err) {
-    console.error("Error fetching posts:", err);
-    res.status(500).send("Error fetching posts");
-    } else {
-      res.json(result);
-    }
-    }
-    );
-  });
+  let query = "SELECT posts.post_id, posts.title, posts.content, posts.user_id, posts.category_id, posts.created_time, posts.updated_time, users.user_name FROM posts INNER JOIN users ON posts.user_id = users.user_id";
+  let countQuery = "SELECT * FROM posts";
+  const params = [];
+  const countParams = [];
 
-  app.get("/posts/count", (req, res) => {
-    db.query("SELECT COUNT(*) AS count FROM posts", (err, result) => {
-      if (err) {
-        console.error("Error fetching post count:", err);
-        res.status(500).send("Error fetching post count");
-      } else {
-        res.json(result[0]);
-      }
-    });
+  if (category) {
+    if (category == "my-posts"){
+      query += " WHERE posts.user_id = ?";
+      countQuery += " WHERE posts.user_id = ?";
+      params.push(user_id);
+      countParams.push(user_id);
+    }
+    else{
+      query += " WHERE category_id = ?";
+      countQuery += " WHERE category_id = ?";
+      params.push(category);
+      countParams.push(category);
+    }
+  }
+  if (searchTitle){
+    query = "SELECT * FROM ("+query+") AS subquery WHERE LOWER(title) LIKE ?"
+    params.push("%" + searchTitle.toLowerCase() + "%");
+    countQuery = "SELECT * FROM ("+countQuery+") AS subquery1 where LOWER(title) LIKE ?";
+    countParams.push("%" + searchTitle.toLowerCase() + "%");
+  }
+  countQuery = "SELECT COUNT(*) AS count FROM ("+countQuery+") AS subquery2";
+
+  query += " ORDER BY created_time";
+
+  if (sort === "newest") {
+    query += " DESC";
+  } else if (sort === "oldest") {
+    query += " ASC";
+  }
+
+  query += " LIMIT ? OFFSET ?";
+  params.push(realPageSize, offset);
+
+
+  db.query(query, params, (err, result) => {
+    if (err) {
+      console.error("Error fetching posts:", err);
+      res.status(500).send("Error fetching posts");
+    } else {
+      db.query(countQuery, countParams, (err, countResult) => {
+        if (err) {
+          console.error("Error fetching post count:", err);
+          res.status(500).send("Error fetching post count");
+        } else {
+          const totalCount = countResult[0].count;
+          res.json({ posts: result, totalCount: totalCount });
+        }
+      });
+    }
   });
+});
   
   app.get("/posts/:post_id", (req, res) => {
     const postId = req.params.post_id;
-    console.log(postId)
-    db.query("SELECT * FROM posts WHERE post_id = ?", [postId], (err, result) => {
+    db.query("SELECT posts.post_id, posts.title, posts.content, posts.user_id, posts.category_id, posts.created_time, posts.updated_time, users.user_name FROM posts INNER JOIN users ON posts.user_id = users.user_id WHERE post_id = ?", [postId], (err, result) => {
       if (err) {
         console.error("Error fetching post:", err);
         res.status(500).send("Error fetching post");
@@ -148,12 +183,25 @@ app.post('/posts/:postId/replies', (req, res) => {
   });
 });
 
+// Get all categories
+  app.get('/categories', (req, res) => {
+    db.query('SELECT * FROM post_category', (err, result) => {
+      if (err) {
+        console.error('Error fetching categories:', err);
+        res.status(500).send('Error fetching categories');
+      } else {
+        res.json(result);
+      }
+    });
+  });
+
+ // New post
   app.post('/createPost', (req, res) => {
-    const { title, content, postType, user_id, user_name } = req.body;
+    const { title, content, category, user_id} = req.body;
   
     db.query(
-      "INSERT INTO posts (title, content, user_id, user_name) VALUES (?, ?, ?, ?)",
-      [title, content, user_id, user_name],
+      "INSERT INTO posts (title, content, user_id, category_id) VALUES (?, ?, ?, ?)",
+      [title, content, user_id, category],
       (err, result) => {
         if (err) {
           console.error("Error creating post:", err);

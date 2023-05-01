@@ -7,6 +7,8 @@ const CreatePost = ({ userId, userName }) => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [postType, setPostType] = useState('post');
+  const [category, setCategory] = useState('');
+  const [categories, setCategories] = useState([]);
   const quillRef = useRef();
 
 
@@ -39,6 +41,16 @@ const CreatePost = ({ userId, userName }) => {
     }
   }, [quillRef]);
 
+  useEffect(() => {
+    Axios.get('http://localhost:3001/categories')
+      .then((response) => {
+        setCategories(response.data);
+      })
+      .catch((error) => {
+        console.error('Error fetching categories:', error);
+      });
+  }, []);
+
   const modules = useMemo(
     () => ({
       toolbar: {
@@ -69,9 +81,8 @@ const CreatePost = ({ userId, userName }) => {
     Axios.post('http://localhost:3001/createPost', {
       title: title,
       content: content,
-      postType: postType,
+      category: category,
       user_id: userId,
-      user_name: userName,
     })
       .then((response) => {
         console.log(response);
@@ -93,6 +104,15 @@ const CreatePost = ({ userId, userName }) => {
         <select value={postType} onChange={(e) => setPostType(e.target.value)}>
           <option value="post">Post</option>
           <option value="market">Market</option>
+        </select>
+        <label>Category:</label>
+        <select value={category} onChange={(e) => setCategory(e.target.value)}>
+          <option value="">Select Category</option>
+          {categories.map((category) => (
+            <option key={category.category_id} value={category.category_id}>
+              {category.category_type}
+            </option>
+          ))}
         </select>
         <button type="submit">Create Post</button>
       </form>
