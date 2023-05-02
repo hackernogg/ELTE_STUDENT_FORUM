@@ -85,18 +85,20 @@ const Home = () => {
   return (
     <div className="home">
       <input type="text" onChange={handleSearchChange} placeholder="Search" />
-      <div className="filter-bar">
-        <select id="category" value={selectedCategory} onChange={handleCategoryChange}>
-          <option value="">All Categories</option>
-          {categories.map((category) => (
-            <option key={category.category_id} value={category.category_id}>
-              {category.category_type}
-            </option>
-          ))}
-          <option value="my-posts">My Posts</option>
-        </select>
+      <div className="controls">
+        <div className="filter-bar">
+          <select className="category-select" id="category" value={selectedCategory} onChange={handleCategoryChange}>
+            <option value="">All Categories</option>
+            {categories.map((category) => (
+              <option key={category.category_id} value={category.category_id}>
+                {category.category_type}
+              </option>
+            ))}
+            <option value="my-posts">My Posts</option>
+          </select>
+        </div>
+        <button className="sort-button" onClick={handleSortToggle}>{sortBy}</button>
       </div>
-      <button onClick={handleSortToggle}>{sortBy}</button>
       <BlogList blogs={blogs} />
       {renderPaginationButtons()}
     </div>

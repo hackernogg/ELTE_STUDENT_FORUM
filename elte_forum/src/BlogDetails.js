@@ -106,27 +106,35 @@ const BlogDetails = () => {
     <div className="blog-details">
       {blog ? (
         <>
-          <h2>{blog.title}</h2>
-          <p>Written by {blog.user_name}</p>
-          <p>Created time {blog.created_time}</p>
-          <div className="blog-content" dangerouslySetInnerHTML={{ __html: blog.content }}></div>
+          <div className="post-box">
+            <div className="post-user">
+              <p className="user-box">{blog.user_name}</p>
+              <p>{new Date(blog.created_time).toLocaleString()}</p>
+            </div>
+            <div className="blog-content">
+              <h2>{blog.title}</h2>
+              <div dangerouslySetInnerHTML={{ __html: blog.content }}></div>
+            </div>
+          </div>
         </>
       ) : (
         <div>Loading...</div>
       )}
-      <h3>Replies:</h3>
+      <form onSubmit={handleSubmit}>
+        <div className="quill-box">
+          <ReactQuill theme="snow" value={content} onChange={setContent} modules={modules} ref={quillRef}/>
+        </div>
+        <button className="quill-submit" type="submit" onClick={() => window.location.reload()}>Reply</button>
+      </form>
       {replies.map((reply) => (
         <div className="reply" key={reply.reply_id}>
+          <div className="reply-user">
+            <p className="reply-user-box">{reply.user_name}</p>
+            <p>{new Date(reply.created_time).toLocaleString()}</p>
+          </div>
           <div className="blog-content" dangerouslySetInnerHTML={{ __html: reply.content }}></div>
-          <p>Written by {reply.user_name}</p>
-          <p>Created time {reply.created_time}</p>
         </div>
       ))}
-      <form onSubmit={handleSubmit}>
-        <label>Reply:</label>
-        <ReactQuill theme="snow" value={content} onChange={setContent} modules={modules} ref={quillRef} />
-        <button type="submit">Reply</button>
-      </form>
     </div>
   );
 };

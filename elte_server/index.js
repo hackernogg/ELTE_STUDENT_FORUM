@@ -157,7 +157,7 @@ app.get("/posts", (req, res) => {
   // GET all replies for a post
   app.get('/posts/:postId/replies', (req, res) => {
     const postId = req.params.postId;
-    db.query('SELECT * FROM replies WHERE post_id = ?', [postId], (err, result) => {
+    db.query('SELECT replies.reply_id, replies.content, replies.user_id, replies.created_time, replies.updated_time, replies.post_id, users.user_name FROM replies INNER JOIN users ON replies.user_id = users.user_id WHERE replies.post_id = ?', [postId], (err, result) => {
       if (err) {
         console.error('Error fetching replies:', err);
         res.status(500).send('Error fetching replies');
@@ -173,7 +173,7 @@ app.post('/posts/:postId/replies', (req, res) => {
   const content = req.body.content;
   const userId = req.body.userId;
   const userName = req.body.userName;
-  db.query('INSERT INTO replies (content, user_id, user_name, post_id) VALUES (?, ?, ?, ?)', [content, userId, userName, postId], (err, result) => {
+  db.query('INSERT INTO replies (content, user_id, post_id) VALUES (?, ?, ?)', [content, userId, postId], (err, result) => {
     if (err) {
       console.error('Error inserting reply:', err);
       res.status(500).send('Error inserting reply');

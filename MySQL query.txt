@@ -44,3 +44,7 @@ mysql -u root -p
 sudo systemctl start nginx 
 sudo systemctl stop nginx 
 sudo systemctl restart nginx
+
+SELECT replies.reply_id, replies.content, replies.user_id, replies.created_time, replies.updated_time, users.user_name
+FROM replies
+INNER JOIN users ON replies.user_id = users.user_id;
