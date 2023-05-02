@@ -35,6 +35,12 @@ CREATE TABLE replies (
   FOREIGN KEY (post_id) REFERENCES posts(post_id)
 );
 
+CREATE TABLE admins (
+  user_id VARCHAR(255) NOT NULL PRIMARY KEY
+);
+
+INSERT INTO admins (user_id) VALUES ('admin');
+
 pm2 stop all
 pm2 restart index.js
 

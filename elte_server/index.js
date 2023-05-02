@@ -76,6 +76,20 @@ app.post('/login', (req,res)=>{
   );
 });
 
+app.get("/admins/:userId", (req, res) => {
+  const userId = req.params.userId;
+  
+  // Query the admins table to check if the user is an admin
+  db.query("SELECT * FROM admins WHERE user_id = ?", [userId], (err, result) => {
+    if (err) {
+      console.error("Error checking admin status:", err);
+      res.status(500).json({ message: "Error checking admin status" });
+    } else {
+      res.json(result);
+    }
+  });
+});
+
 app.get("/posts", (req, res) => {
   const page = req.query.page || 0;
   const pageSize = req.query.pageSize || 7;
@@ -168,21 +182,34 @@ app.get("/posts", (req, res) => {
   });
 
   // POST a new reply for a post
-app.post('/posts/:postId/replies', (req, res) => {
-  const postId = req.params.postId;
-  const content = req.body.content;
-  const userId = req.body.userId;
-  const userName = req.body.userName;
-  db.query('INSERT INTO replies (content, user_id, post_id) VALUES (?, ?, ?)', [content, userId, postId], (err, result) => {
-    if (err) {
-      console.error('Error inserting reply:', err);
-      res.status(500).send('Error inserting reply');
-    } else {
-      res.json(result);
-    }
+  app.post('/posts/:postId/replies', (req, res) => {
+    const postId = req.params.postId;
+    const content = req.body.content;
+    const userId = req.body.userId;
+    const userName = req.body.userName;
+    db.query('INSERT INTO replies (content, user_id, post_id) VALUES (?, ?, ?)', [content, userId, postId], (err, result) => {
+      if (err) {
+        console.error('Error inserting reply:', err);
+        res.status(500).send('Error inserting reply');
+      } else {
+        res.json(result);
+      }
+    });
   });
-});
 
+  app.delete('/replies/:replyId', (req, res) => {
+    const replyId = req.params.replyId;
+  
+    // Execute the query to remove the reply with the given replyId
+    db.query('DELETE FROM replies WHERE reply_id = ?', [replyId], (err, result) => {
+      if (err) {
+        console.error('Error removing reply:', err);
+        res.status(500).send('Error removing reply');
+      } else {
+        res.status(200).send('Reply removed successfully');
+      }
+    });
+  });
 // Get all categories
   app.get('/categories', (req, res) => {
     db.query('SELECT * FROM post_category', (err, result) => {
@@ -212,6 +239,30 @@ app.post('/posts/:postId/replies', (req, res) => {
       }
     );
   });
+
+  //remove post
+  app.delete('/posts/:postId', (req, res) => {
+    const postId = req.params.postId;
+  
+ 
+          // User is authorized, proceed with removing the post and its replies
+          db.query('DELETE FROM replies WHERE post_id = ?', [postId], (err, result) => {
+            if (err) {
+              console.error('Error removing replies:', err);
+              res.status(500).send('Error removing replies');
+            } else {
+              db.query('DELETE FROM posts WHERE post_id = ?', [postId], (err, result) => {
+                if (err) {
+                  console.error('Error removing post:', err);
+                  res.status(500).send('Error removing post');
+                } else {
+                  res.status(200).send('Post removed successfully');
+                }
+              });
+            }
+          });
+  });
+
 
   const storage = multer.diskStorage({
     destination: function (req, file, cb) {

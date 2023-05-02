@@ -82,6 +82,7 @@ input[type="password"] {
   padding: 6px;
   border-radius: 10px;
   transition: all 0.3s;
+  white-space: nowrap;
 }
 .navbar .username:hover {
   color:  #f1356d;
@@ -267,6 +268,41 @@ input[type="password"] {
 .blog-content img {
   max-width: 100%;
   border-radius: 10px;
+}
+
+.post-remove {
+  display: flex;
+  align-items: center;
+}
+.post-remove button {
+  border: 1px solid #b235f1; /* Add border */
+  color: #340043;
+  background-color: transparent;
+  border-radius: 10px; 
+  display: inline-block;
+  font-weight: bold;
+  margin-right: 2px;
+}
+.post-remove button:hover {
+  background-color: #ddd;
+  color: #f13593;
+}
+.reply-remove{
+  display: flex;
+  align-items: center;
+}
+.reply-remove button{
+  border: 1px solid #f13593; /* Add border */
+  color: #340043;
+  background-color: transparent;
+  border-radius: 10px; 
+  display: inline-block;
+  font-weight: bold;
+  margin-right: 11px;
+}
+.reply-remove button:hover{
+  background-color: #ddd;
+  color: #b235f1;
 }
 /*rich text*/
 .quill-box{

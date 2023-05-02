@@ -4,12 +4,12 @@ import Axios from "axios";
 
 const Home = () => {
   const [blogs, setBlogs] = useState([]);
-  const [pageNumber, setPageNumber] = useState(0);
-  const [postsPerPage, setPostsPerPage] = useState(7);
-  const [totalCount, setTotalCount] = useState(0);
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [pageNumber, setPageNumber] = useState(parseInt(sessionStorage.getItem("pageNumber"), 10)|| 0);
+  const [pageCount,setPageCount] = useState(0);
+  const [postsPerPage] = useState(7);
+  const [selectedCategory, setSelectedCategory] = useState(sessionStorage.getItem("selectedCategory") || "");
   const [categories, setCategories] = useState([]);
-  const [sortBy, setSortBy] = useState("newest");
+  const [sortBy, setSortBy] = useState(sessionStorage.getItem("sortBy") || "newest");
   const [searchTitle, setSearchTitle] = useState("");
   const storedUserid = localStorage.getItem("loggedInUserid");
 
@@ -17,12 +17,15 @@ const Home = () => {
     Axios.get(`http://localhost:3001/posts?page=${pageNumber}&pageSize=${postsPerPage}&category=${selectedCategory}&sort=${sortBy}&user_id=${storedUserid}&searchTitle=${searchTitle}`)
       .then((response) => {
         setBlogs(response.data.posts); // Update to set the blogs from the 'posts' property in the response data
-        setTotalCount(response.data.totalCount); // Set the total count of posts
+        setPageCount(Math.max(1, Math.ceil(response.data.totalCount / postsPerPage)));
+        if (pageNumber>Math.max(1, Math.ceil(response.data.totalCount / postsPerPage))-1){
+          setPageNumber(Math.max(1, Math.ceil(response.data.totalCount / postsPerPage))-1);
+        }
       })
       .catch((error) => {
         console.error("Error fetching posts:", error);
       });
-  }, [pageNumber, postsPerPage, selectedCategory, sortBy, searchTitle]);
+  }, [pageNumber, postsPerPage, selectedCategory, sortBy, storedUserid, searchTitle]);
 
   useEffect(() => {
     Axios.get("http://localhost:3001/categories")
@@ -33,6 +36,12 @@ const Home = () => {
         console.error("Error fetching categories:", error);
       });
   }, []);
+
+  useEffect(() => {
+    sessionStorage.setItem('selectedCategory', selectedCategory);
+    sessionStorage.setItem('sortBy', sortBy);
+    sessionStorage.setItem('pageNumber', pageNumber);
+  },[selectedCategory, sortBy, pageNumber, pageCount]);
 
   const handleSearchChange = (e) => {
     setSearchTitle(e.target.value);
@@ -52,14 +61,9 @@ const Home = () => {
   const handlePageClick = (pageNumber) => {
     setPageNumber(pageNumber);
   };
-
-
-  let pageCount = Math.ceil(totalCount / postsPerPage);
-
+  
   const renderPaginationButtons = () => {
-    if (pageCount<=0){
-      pageCount = 1
-    }
+
     const isFirstPage = pageNumber === 0;
     const isLastPage = pageNumber === pageCount - 1;
 

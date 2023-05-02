@@ -7,6 +7,7 @@ const Navbar = (props) => {
     const logout = () => {
         localStorage.removeItem("isLoggedIn");
         localStorage.removeItem("loggedInUsername");
+        localStorage.removeItem("isAdmin");
         window.location.href = "/";
       };
 

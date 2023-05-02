@@ -1,4 +1,5 @@
 import { useParams } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import Axios from "axios";
 import ReactQuill from 'react-quill';
@@ -11,7 +12,7 @@ const BlogDetails = () => {
 
   const storedUsername = localStorage.getItem("loggedInUsername");
   const storedUserid = localStorage.getItem("loggedInUserid");
-  console.log(storedUsername);
+  const isAdmin = localStorage.getItem("isAdmin");
 
   const [replies, setReplies] = useState([]);
   const [content, setContent] = useState('');
@@ -64,7 +65,6 @@ const BlogDetails = () => {
   );
 
   useEffect(() => {
-    console.log(id);
     Axios.get(`http://localhost:3001/posts/${id}`)
       .then((response) => {
         setBlog(response.data);
@@ -101,6 +101,33 @@ const BlogDetails = () => {
         console.error('Error creating post:', error);
       });
   };
+  const navigate = useNavigate();
+  const handleRemovePost = (postId) => {
+    // Send a request to the server to remove the post with the given postId and userId
+    Axios.delete(`http://localhost:3001/posts/${postId}`)
+      .then((response) => {
+        console.log('Post removed successfully:', response);
+        // Handle any necessary update or refresh of the blog list
+        navigate(-1, { replace: true });
+        
+      })
+      .catch((error) => {
+        console.error('Error removing post:', error);
+      });
+  };
+
+  const handleRemoveReply = (replyId) => {
+    // Send a request to the server to remove the reply with the given replyId
+    Axios.delete(`http://localhost:3001/replies/${replyId}`)
+      .then((response) => {
+        console.log('Reply removed successfully:', response);
+        // Handle any necessary update or refresh of the replies list
+        window.location.reload();
+      })
+      .catch((error) => {
+        console.error('Error removing reply:', error);
+      });
+  };
 
   return (
     <div className="blog-details">
@@ -109,7 +136,14 @@ const BlogDetails = () => {
           <div className="post-box">
             <div className="post-user">
               <p className="user-box">{blog.user_name}</p>
-              <p>{new Date(blog.created_time).toLocaleString()}</p>
+              <div className="post-remove">
+                {(isAdmin || storedUserid === blog.user_id) && (
+                  <button onClick={() => handleRemovePost(blog.post_id)}>
+                    ✘
+                  </button>
+                )}
+                <p>{new Date(blog.created_time).toLocaleString()}</p>
+              </div>
             </div>
             <div className="blog-content">
               <h2>{blog.title}</h2>
@@ -130,7 +164,14 @@ const BlogDetails = () => {
         <div className="reply" key={reply.reply_id}>
           <div className="reply-user">
             <p className="reply-user-box">{reply.user_name}</p>
-            <p>{new Date(reply.created_time).toLocaleString()}</p>
+            <div className="reply-remove">
+              <p>{new Date(reply.created_time).toLocaleString()}</p>
+              {(isAdmin||storedUserid === reply.user_id) && (
+                  <button onClick={() => handleRemoveReply(reply.reply_id)}>
+                    ✘
+                  </button>
+              )}
+            </div>
           </div>
           <div className="blog-content" dangerouslySetInnerHTML={{ __html: reply.content }}></div>
         </div>
