@@ -17,9 +17,26 @@ CREATE TABLE posts (
   FOREIGN KEY (category_id) REFERENCES post_category(category_id)
 );
 
+CREATE TABLE market_posts (
+  post_id INT AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  content TEXT NOT NULL,
+  user_id VARCHAR(255),
+  category_id INT,
+  price INT NOT NULL,
+  created_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(user_id),
+  FOREIGN KEY (category_id) REFERENCES market_category(category_id)
+);
 
 
 CREATE TABLE post_category (
+  category_id INT AUTO_INCREMENT PRIMARY KEY,
+  category_type VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE market_category (
   category_id INT AUTO_INCREMENT PRIMARY KEY,
   category_type VARCHAR(255) NOT NULL
 );
@@ -33,6 +50,17 @@ CREATE TABLE replies (
   post_id INT,
   FOREIGN KEY (user_id) REFERENCES users(user_id),
   FOREIGN KEY (post_id) REFERENCES posts(post_id)
+);
+
+CREATE TABLE market_replies (
+  reply_id INT AUTO_INCREMENT PRIMARY KEY,
+  content TEXT NOT NULL,
+  user_id VARCHAR(255),
+  created_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  post_id INT,
+  FOREIGN KEY (user_id) REFERENCES users(user_id),
+  FOREIGN KEY (post_id) REFERENCES market_posts(post_id)
 );
 
 CREATE TABLE admins (

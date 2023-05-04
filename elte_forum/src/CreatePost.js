@@ -3,13 +3,16 @@ import Axios from 'axios';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
-const CreatePost = ({ userId, userName }) => {
+const CreatePost = () => {
   const [title, setTitle] = useState('');
+  const [price, setPrice] = useState("");
   const [content, setContent] = useState('');
   const [postType, setPostType] = useState('post');
-  const [category, setCategory] = useState('');
+  const [category, setCategory] = useState(1);
   const [categories, setCategories] = useState([]);
+  const storedUserid = localStorage.getItem("loggedInUserid");
   const quillRef = useRef();
+  console.log(category);
 
 
   const handleImageUpload = () => {
@@ -42,14 +45,25 @@ const CreatePost = ({ userId, userName }) => {
   }, [quillRef]);
 
   useEffect(() => {
-    Axios.get('http://localhost:3001/categories')
+    if (postType === "post") {
+      Axios.get('http://localhost:3001/categories')
       .then((response) => {
         setCategories(response.data);
       })
       .catch((error) => {
         console.error('Error fetching categories:', error);
       });
-  }, []);
+    } else if (postType === "market") {
+      Axios.get('http://localhost:3001/market_categories')
+      .then((response) => {
+        setCategories(response.data);
+      })
+      .catch((error) => {
+        console.error('Error fetching categories:', error);
+      });
+    }
+
+  }, [postType]);
 
   const modules = useMemo(
     () => ({
@@ -78,18 +92,35 @@ const CreatePost = ({ userId, userName }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Submit the post to the server
-    Axios.post('http://localhost:3001/createPost', {
-      title: title,
-      content: content,
-      category: category,
-      user_id: userId,
-    })
-      .then((response) => {
-        console.log(response);
+    if (postType === "post"){
+      Axios.post('http://localhost:3001/createPost', {
+        title: title,
+        content: content,
+        category: category,
+        user_id: storedUserid,
       })
-      .catch((error) => {
-        console.error('Error creating post:', error);
-      });
+        .then((response) => {
+          console.log(response);
+        })
+        .catch((error) => {
+          console.error('Error creating post:', error);
+        });
+    } else if (postType === "market") {
+      Axios.post('http://localhost:3001/market_createPost', {
+        title: title,
+        price: price,
+        content: content,
+        category: category,
+        user_id: storedUserid,
+      })
+        .then((response) => {
+          console.log(response);
+        })
+        .catch((error) => {
+          console.error('Error creating post:', error);
+        });
+    }
+
   };
 
   return (
@@ -98,6 +129,12 @@ const CreatePost = ({ userId, userName }) => {
       <form onSubmit={handleSubmit}>
         <label>Title:</label>
         <input type="text" required value={title} onChange={(e) => setTitle(e.target.value)} />
+        {postType === "market" && (
+          <>
+            <label>Price (HUF):</label>
+            <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} />
+          </>
+        )}
         <label>Content:</label>
         <ReactQuill theme="snow" value={content} onChange={setContent} modules={modules} ref={quillRef} />
         <label>Post Type:</label>
@@ -107,7 +144,6 @@ const CreatePost = ({ userId, userName }) => {
         </select>
         <label>Category:</label>
         <select value={category} onChange={(e) => setCategory(e.target.value)}>
-          <option value="">Select Category</option>
           {categories.map((category) => (
             <option key={category.category_id} value={category.category_id}>
               {category.category_type}

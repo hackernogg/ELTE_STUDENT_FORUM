@@ -71,6 +71,7 @@ const LoginReg = (props) => {
           .then((adminResponse) => {
             if (adminResponse.data.length > 0){
               localStorage.setItem("isAdmin", true);
+              console.log(localStorage.getItem("isAdmin"));
             }
           })
           .catch((error) => {
@@ -85,23 +86,23 @@ const LoginReg = (props) => {
       <h1>Welcome to ELTE student forum</h1>
       <div className='registration'>
         <h2>Registration</h2>
-        <label>User ID</label>
         <input
           type="text"
+          placeholder="User ID..."
           onChange={(e) => {
             setUseridReg(e.target.value);
           }}
         />
-        <label>Username</label>
         <input
           type="text"
+          placeholder="User name..."
           onChange={(e) => {
             setUsernameReg(e.target.value);
           }}
         />
-        <label>Password</label>
         <input
           type="text"
+          placeholder="Password..."
           onChange={(e) => {
             setPasswordReg(e.target.value);
           }}
@@ -110,7 +111,7 @@ const LoginReg = (props) => {
       </div>
       {regStatus && (
         <div>
-          <h1>{regStatus}</h1>
+          <h3>{regStatus}</h3>
         </div>
       )}
 

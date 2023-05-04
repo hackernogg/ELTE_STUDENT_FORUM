@@ -200,6 +200,16 @@ input[type="password"] {
 .preview-info p {
   margin: 4px 0;
 }
+.price-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+.price {
+  margin-right: 10px;
+  font-weight: bold;
+}
 
 /*page bar*/
 
@@ -259,7 +269,9 @@ input[type="password"] {
   display: inline-block;
   font-weight: bold;
 }
-
+.title{
+  color: #f1356d;
+}
 .blog-content {
   max-width: 600px; /* Adjust this to the desired maximum width */
   padding: 10px 16px;

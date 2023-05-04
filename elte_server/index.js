@@ -155,10 +155,88 @@ app.get("/posts", (req, res) => {
     }
   });
 });
+
+app.get("/market_posts", (req, res) => {
+  const page = req.query.page || 0;
+  const pageSize = req.query.pageSize || 7;
+  const category = req.query.category || "";
+  const sort = req.query.sort || "newest";
+  const user_id = req.query.user_id || "";
+  const searchTitle = req.query.searchTitle || "";
+  const realPageSize = pageSize * 1;
+  const offset = page * pageSize;
+  let query = "SELECT market_posts.post_id, market_posts.title, market_posts.price, market_posts.content, market_posts.user_id, market_posts.category_id, market_posts.created_time, market_posts.updated_time, users.user_name FROM market_posts INNER JOIN users ON market_posts.user_id = users.user_id";
+  let countQuery = "SELECT * FROM market_posts";
+  const params = [];
+  const countParams = [];
+
+  if (category) {
+    if (category == "my-posts"){
+      query += " WHERE market_posts.user_id = ?";
+      countQuery += " WHERE market_posts.user_id = ?";
+      params.push(user_id);
+      countParams.push(user_id);
+    }
+    else{
+      query += " WHERE category_id = ?";
+      countQuery += " WHERE category_id = ?";
+      params.push(category);
+      countParams.push(category);
+    }
+  }
+  if (searchTitle){
+    query = "SELECT * FROM ("+query+") AS subquery WHERE LOWER(title) LIKE ?"
+    params.push("%" + searchTitle.toLowerCase() + "%");
+    countQuery = "SELECT * FROM ("+countQuery+") AS subquery1 where LOWER(title) LIKE ?";
+    countParams.push("%" + searchTitle.toLowerCase() + "%");
+  }
+  countQuery = "SELECT COUNT(*) AS count FROM ("+countQuery+") AS subquery2";
+
+  query += " ORDER BY created_time";
+
+  if (sort === "newest") {
+    query += " DESC";
+  } else if (sort === "oldest") {
+    query += " ASC";
+  }
+
+  query += " LIMIT ? OFFSET ?";
+  params.push(realPageSize, offset);
+
+
+  db.query(query, params, (err, result) => {
+    if (err) {
+      console.error("Error fetching market_posts:", err);
+      res.status(500).send("Error fetching market_posts");
+    } else {
+      db.query(countQuery, countParams, (err, countResult) => {
+        if (err) {
+          console.error("Error fetching market_posts count:", err);
+          res.status(500).send("Error fetching market_posts count");
+        } else {
+          const totalCount = countResult[0].count;
+          res.json({ posts: result, totalCount: totalCount });
+        }
+      });
+    }
+  });
+});
   
   app.get("/posts/:post_id", (req, res) => {
     const postId = req.params.post_id;
     db.query("SELECT posts.post_id, posts.title, posts.content, posts.user_id, posts.category_id, posts.created_time, posts.updated_time, users.user_name FROM posts INNER JOIN users ON posts.user_id = users.user_id WHERE post_id = ?", [postId], (err, result) => {
+      if (err) {
+        console.error("Error fetching post:", err);
+        res.status(500).send("Error fetching post");
+      } else {
+        res.json(result[0]); // Send the first result (should be the only one)
+      }
+    });
+  });
+
+  app.get("/market_posts/:post_id", (req, res) => {
+    const postId = req.params.post_id;
+    db.query("SELECT market_posts.post_id, market_posts.title, market_posts.price, market_posts.content, market_posts.user_id, market_posts.category_id, market_posts.created_time, market_posts.updated_time, users.user_name FROM market_posts INNER JOIN users ON market_posts.user_id = users.user_id WHERE post_id = ?", [postId], (err, result) => {
       if (err) {
         console.error("Error fetching post:", err);
         res.status(500).send("Error fetching post");
@@ -181,18 +259,69 @@ app.get("/posts", (req, res) => {
     });
   });
 
+  app.get('/market_posts/:postId/replies', (req, res) => {
+    const postId = req.params.postId;
+    db.query('SELECT market_replies.reply_id, market_replies.content, market_replies.user_id, market_replies.created_time, market_replies.updated_time, market_replies.post_id, users.user_name FROM market_replies INNER JOIN users ON market_replies.user_id = users.user_id WHERE market_replies.post_id = ?', [postId], (err, result) => {
+      if (err) {
+        console.error('Error fetching replies:', err);
+        res.status(500).send('Error fetching replies');
+      } else {
+        res.json(result);
+      }
+    });
+  });
+
   // POST a new reply for a post
   app.post('/posts/:postId/replies', (req, res) => {
     const postId = req.params.postId;
     const content = req.body.content;
     const userId = req.body.userId;
-    const userName = req.body.userName;
-    db.query('INSERT INTO replies (content, user_id, post_id) VALUES (?, ?, ?)', [content, userId, postId], (err, result) => {
+    
+    db.query('SELECT * FROM posts WHERE post_id = ?', [postId], (err, result) => {
       if (err) {
-        console.error('Error inserting reply:', err);
-        res.status(500).send('Error inserting reply');
+        console.error('Error checking post:', err);
+        res.status(500).send('Error checking post');
       } else {
-        res.json(result);
+        const post = result[0];
+        if (!post) {
+          res.status(404).send('Post not found');
+        } else {
+          db.query('INSERT INTO replies (content, user_id, post_id) VALUES (?, ?, ?)', [content, userId, postId], (err, result) => {
+            if (err) {
+              console.error('Error inserting reply:', err);
+              res.status(500).send('Error inserting reply');
+            } else {
+              res.json(result);
+            }
+          });
+        }
+      }
+    });
+  });
+
+  app.post('/market_posts/:postId/replies', (req, res) => {
+    const postId = req.params.postId;
+    const content = req.body.content;
+    const userId = req.body.userId;
+    
+    db.query('SELECT * FROM market_posts WHERE post_id = ?', [postId], (err, result) => {
+      if (err) {
+        console.error('Error checking market_posts:', err);
+        res.status(500).send('Error checking market_posts');
+      } else {
+        const post = result[0];
+        if (!post) {
+          res.status(404).send('Post not found');
+        } else {
+          db.query('INSERT INTO market_replies (content, user_id, post_id) VALUES (?, ?, ?)', [content, userId, postId], (err, result) => {
+            if (err) {
+              console.error('Error inserting market_replies:', err);
+              res.status(500).send('Error inserting market_replies');
+            } else {
+              res.json(result);
+            }
+          });
+        }
       }
     });
   });
@@ -202,6 +331,20 @@ app.get("/posts", (req, res) => {
   
     // Execute the query to remove the reply with the given replyId
     db.query('DELETE FROM replies WHERE reply_id = ?', [replyId], (err, result) => {
+      if (err) {
+        console.error('Error removing reply:', err);
+        res.status(500).send('Error removing reply');
+      } else {
+        res.status(200).send('Reply removed successfully');
+      }
+    });
+  });
+
+  app.delete('/market_replies/:replyId', (req, res) => {
+    const replyId = req.params.replyId;
+  
+    // Execute the query to remove the reply with the given replyId
+    db.query('DELETE FROM market_replies WHERE reply_id = ?', [replyId], (err, result) => {
       if (err) {
         console.error('Error removing reply:', err);
         res.status(500).send('Error removing reply');
@@ -222,6 +365,17 @@ app.get("/posts", (req, res) => {
     });
   });
 
+  app.get('/market_categories', (req, res) => {
+    db.query('SELECT * FROM market_category', (err, result) => {
+      if (err) {
+        console.error('Error fetching categories:', err);
+        res.status(500).send('Error fetching categories');
+      } else {
+        res.json(result);
+      }
+    });
+  });
+
  // New post
   app.post('/createPost', (req, res) => {
     const { title, content, category, user_id} = req.body;
@@ -229,6 +383,23 @@ app.get("/posts", (req, res) => {
     db.query(
       "INSERT INTO posts (title, content, user_id, category_id) VALUES (?, ?, ?, ?)",
       [title, content, user_id, category],
+      (err, result) => {
+        if (err) {
+          console.error("Error creating post:", err);
+          res.status(500).send("Error creating post");
+        } else {
+          res.json({ message: "Post created successfully" });
+        }
+      }
+    );
+  });
+
+  app.post('/market_createPost', (req, res) => {
+    const { title, price, content, category, user_id} = req.body;
+  
+    db.query(
+      "INSERT INTO market_posts (title, price, content, user_id, category_id) VALUES (?, ?, ?, ?, ?)",
+      [title, price, content, user_id, category],
       (err, result) => {
         if (err) {
           console.error("Error creating post:", err);
@@ -257,6 +428,28 @@ app.get("/posts", (req, res) => {
                   res.status(500).send('Error removing post');
                 } else {
                   res.status(200).send('Post removed successfully');
+                }
+              });
+            }
+          });
+  });
+
+  app.delete('/market_posts/:postId', (req, res) => {
+    const postId = req.params.postId;
+  
+ 
+          // User is authorized, proceed with removing the post and its replies
+          db.query('DELETE FROM market_replies WHERE post_id = ?', [postId], (err, result) => {
+            if (err) {
+              console.error('Error removing market_replies:', err);
+              res.status(500).send('Error removing market_replies');
+            } else {
+              db.query('DELETE FROM market_posts WHERE post_id = ?', [postId], (err, result) => {
+                if (err) {
+                  console.error('Error removing market_post:', err);
+                  res.status(500).send('Error removing market_post');
+                } else {
+                  res.status(200).send('Market_Post removed successfully');
                 }
               });
             }

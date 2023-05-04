@@ -67,7 +67,7 @@ const BlogDetails = () => {
   );
 
   useEffect(() => {
-    Axios.get(`http://localhost:3001/posts/${id}`)
+    Axios.get(`http://localhost:3001/market_posts/${id}`)
       .then((response) => {
         if (!response.data) {
           navigate("/");
@@ -83,7 +83,7 @@ const BlogDetails = () => {
 
 
   useEffect(() => {
-    Axios.get(`http://localhost:3001/posts/${id}/replies`)
+    Axios.get(`http://localhost:3001/market_posts/${id}/replies`)
       .then((response) => {
         setReplies(response.data);
       })
@@ -95,7 +95,7 @@ const BlogDetails = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Submit the post to the server
-    Axios.post(`http://localhost:3001/posts/${id}/replies`, {
+    Axios.post(`http://localhost:3001/market_posts/${id}/replies`, {
       content: content,
       userId: storedUserid,
       userName: storedUsername
@@ -107,14 +107,13 @@ const BlogDetails = () => {
         console.error('Error creating post:', error);
       });
   };
-  
   const handleRemovePost = (postId) => {
     // Send a request to the server to remove the post with the given postId and userId
-    Axios.delete(`http://localhost:3001/posts/${postId}`)
+    Axios.delete(`http://localhost:3001/market_posts/${postId}`)
       .then((response) => {
         console.log('Post removed successfully:', response);
         // Handle any necessary update or refresh of the blog list
-        navigate("/");
+        navigate("/market");
         
       })
       .catch((error) => {
@@ -124,7 +123,7 @@ const BlogDetails = () => {
 
   const handleRemoveReply = (replyId) => {
     // Send a request to the server to remove the reply with the given replyId
-    Axios.delete(`http://localhost:3001/replies/${replyId}`)
+    Axios.delete(`http://localhost:3001/market_replies/${replyId}`)
       .then((response) => {
         console.log('Reply removed successfully:', response);
         // Handle any necessary update or refresh of the replies list
@@ -143,7 +142,7 @@ const BlogDetails = () => {
             <div className="post-user">
               <p className="user-box">{blog.user_name}</p>
               <div className="post-remove">
-                {(isAdmin || storedUserid === blog.user_id) && (
+                {( isAdmin || storedUserid === blog.user_id ) && (
                   <button onClick={() => handleRemovePost(blog.post_id)}>
                     ✘
                   </button>
@@ -153,6 +152,7 @@ const BlogDetails = () => {
             </div>
             <div className="blog-content">
               <h2 className="title">{blog.title}</h2>
+              <h3>{blog.price} HUF</h3>
               <div dangerouslySetInnerHTML={{ __html: blog.content }}></div>
             </div>
           </div>
