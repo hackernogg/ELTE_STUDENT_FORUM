@@ -4,7 +4,6 @@ const cors = require("cors");
 const multer = require('multer');
 const path = require('path');
 const bcrypt = require('bcrypt');
-//this V
 
 const app = express();
 const saltRounds = 10;
@@ -87,6 +86,78 @@ app.get("/admins/:userId", (req, res) => {
     } else {
       res.json(result);
     }
+  });
+});
+
+app.post('/changeName', (req, res) => {
+  const userid = req.body.userid;
+  const username = req.body.username;
+
+  db.query(
+    "UPDATE users SET user_name = ? WHERE user_id = ?",
+    [username, userid],
+    (err, result) => {
+      if (err) {
+        console.log(err);
+        res.status(500).send({ message: "Error updating username" });
+      } else {
+        res.send({ message: "Username updated successfully" });
+      }
+    }
+  );
+});
+
+app.post('/verifyAndUpdatePassword', (req, res) => {
+  const { userid, currentPassword, newPassword } = req.body;
+
+  // Retrieve the stored hash for the user's current password
+  db.query("SELECT user_pwd FROM users WHERE user_id = ?", [userid], (err, result) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send({ message: 'Error retrieving password hash' });
+      return;
+    }
+
+    if (result.length === 0) {
+      res.status(404).send({ message: 'User not found' });
+      return;
+    }
+
+    const storedHash = result[0].user_pwd;
+
+    // Verify the user's current password
+    bcrypt.compare(currentPassword, storedHash, (err, isMatch) => {
+      if (err) {
+        console.error(err);
+        res.status(500).send({ message: 'Error verifying current password' });
+        return;
+      }
+
+      if (!isMatch) {
+        res.send({ message: 'Incorrect current password' });
+        return;
+      }
+
+      // Update the user's password
+      bcrypt.hash(newPassword, saltRounds, (err, newHash) => {
+        if (err) {
+          console.error(err);
+          res.status(500).send({ message: 'Error hashing new password' });
+          return;
+        }
+
+        // Update the password hash in the database
+        db.query("UPDATE users SET user_pwd = ? WHERE user_id = ?", [newHash, userid], (err, result) => {
+          if (err) {
+            console.error('Error updating password in database:', err);
+            res.status(500).send({ message: 'Failed to update password' });
+            return;
+          }
+          
+          res.send({ message: 'Password updated successfully' });
+        });
+      });
+    });
   });
 });
 

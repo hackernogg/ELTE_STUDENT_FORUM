@@ -1,8 +1,13 @@
+import { useState,useEffect } from "react";
 import React from "react";
 import { Link } from 'react-router-dom';
 
-const Navbar = (props) => {
-    const username = props.username;
+const Navbar = () => {
+    const [username, setUsername] = useState(localStorage.getItem("loggedInUsername"));
+
+    useEffect(() => {
+        setUsername(localStorage.getItem("loggedInUsername"));
+      }, [localStorage.getItem("loggedInUsername")]);
 
     const logout = () => {
         localStorage.removeItem("isLoggedIn");
@@ -20,7 +25,7 @@ const Navbar = (props) => {
                 <Link to="/createPost">
                     <button className="logout-button">+</button>
                 </Link>
-                <a href="/creat" className="username">{username}</a>
+                <a href="/settings" className="username">{username}</a>
                 <button className="logout-button" onClick={logout} >➮</button>
             </div>
         </nav>

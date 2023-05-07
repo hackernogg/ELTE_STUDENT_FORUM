@@ -6,13 +6,13 @@ import BlogDetails from "./BlogDetails";
 import CreatePost from './CreatePost';
 import Market from './Market';
 import MarketBlogDetails from './MarketBlogDetails';
+import Settings from './Settings';
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 function App() {
   const [loginStatus, setloginStatus] = useState("");
   const [username, setUsername] = useState("");
   const [userId, setUserId] = useState(null);
-  console.log(userId);
   const handleChildData = (data1,data2,data3) => {
     setloginStatus(data1);
     setUsername(data2);
@@ -27,7 +27,7 @@ function App() {
 
         {(loginStatus === username && loginStatus !== "" ) && (
           <div>
-            <Navbar username={username}/>
+            <Navbar/>
             <div className="content">
               <Routes>
                 <Route exact path="/" element={<Home />} />
@@ -35,6 +35,7 @@ function App() {
                 <Route path="/createPost" element={<CreatePost />} />
                 <Route path="/Market" element={<Market />} />
                 <Route path="/market_blogs/:id" element={<MarketBlogDetails />} />
+                <Route path="/settings" element={<Settings />} />
               </Routes>
             </div>
           </div>
