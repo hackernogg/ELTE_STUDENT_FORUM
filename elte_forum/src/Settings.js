@@ -127,7 +127,7 @@ const Settings = () =>{
         <div className='error-msg'>
           <h3>{errorMsg}</h3>
         </div>
-      )}
+        )}
         </div>
     );
 }

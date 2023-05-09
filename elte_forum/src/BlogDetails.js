@@ -18,6 +18,7 @@ const BlogDetails = () => {
 
   const [replies, setReplies] = useState([]);
   const [content, setContent] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
   const quillRef = useRef();
 
   const handleImageUpload = () => {
@@ -37,7 +38,7 @@ const BlogDetails = () => {
           editor.insertEmbed(range.index, 'image', url);
         })
         .catch((error) => {
-          console.error('Error uploading image:', error);
+          setErrorMsg('Error uploading image:', error);
         });
     };
     input.click();
@@ -76,7 +77,7 @@ const BlogDetails = () => {
         }
       })
       .catch((error) => {
-        console.error("Error fetching post:", error);
+        setErrorMsg("Error fetching post:", error);
       });
   }, [id,navigate]);
 
@@ -88,23 +89,22 @@ const BlogDetails = () => {
         setReplies(response.data);
       })
       .catch((error) => {
-        console.error("Error fetching replies:", error);
+        setErrorMsg("Error fetching replies:", error);
       });
   }, [id]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Submit the post to the server
     Axios.post(`http://localhost:3001/posts/${id}/replies`, {
       content: content,
       userId: storedUserid,
       userName: storedUsername
     })
       .then((response) => {
-        console.log(response);
+        window.location.reload()
       })
       .catch((error) => {
-        console.error('Error creating post:', error);
+        setErrorMsg('Error creating post:', error);
       });
   };
   
@@ -112,13 +112,12 @@ const BlogDetails = () => {
     // Send a request to the server to remove the post with the given postId and userId
     Axios.delete(`http://localhost:3001/posts/${postId}`)
       .then((response) => {
-        console.log('Post removed successfully:', response);
         // Handle any necessary update or refresh of the blog list
         navigate("/");
         
       })
       .catch((error) => {
-        console.error('Error removing post:', error);
+        setErrorMsg('Error removing post:', error);
       });
   };
 
@@ -126,12 +125,11 @@ const BlogDetails = () => {
     // Send a request to the server to remove the reply with the given replyId
     Axios.delete(`http://localhost:3001/replies/${replyId}`)
       .then((response) => {
-        console.log('Reply removed successfully:', response);
         // Handle any necessary update or refresh of the replies list
         window.location.reload();
       })
       .catch((error) => {
-        console.error('Error removing reply:', error);
+        setErrorMsg('Error removing reply:', error);
       });
   };
 
@@ -160,8 +158,13 @@ const BlogDetails = () => {
             <div className="quill-box">
               <ReactQuill theme="snow" value={content} onChange={setContent} modules={modules} ref={quillRef}/>
             </div>
-            <button className="quill-submit" type="submit" onClick={() => window.location.reload()}>Reply</button>
+            <button className="quill-submit" type="submit">Reply</button>
           </form>
+          {errorMsg && (
+          <div className='error-msg'>
+            <h3>{errorMsg}</h3>
+          </div>
+          )}
         </>
       ) : (
         <div>Not Found</div>

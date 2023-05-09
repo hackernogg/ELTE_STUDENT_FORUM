@@ -53,7 +53,7 @@ app.post('/login', (req,res)=>{
   const userid = req.body.userid;
   const password = req.body.password;
   db.query(
-    "SELECT * FROM users WHERE user_id = ?",
+    "SELECT * FROM users WHERE BINARY user_id = ?",
     [userid],
     (err,result)=>{
       if (err){
@@ -323,7 +323,7 @@ app.get("/market_posts", (req, res) => {
   // GET all replies for a post
   app.get('/posts/:postId/replies', (req, res) => {
     const postId = req.params.postId;
-    db.query('SELECT replies.reply_id, replies.content, replies.user_id, replies.created_time, replies.updated_time, replies.post_id, users.user_name FROM replies INNER JOIN users ON replies.user_id = users.user_id WHERE replies.post_id = ?', [postId], (err, result) => {
+    db.query('SELECT replies.reply_id, replies.content, replies.user_id, replies.created_time, replies.updated_time, replies.post_id, users.user_name FROM replies INNER JOIN users ON replies.user_id = users.user_id WHERE replies.post_id = ? ORDER BY replies.created_time ASC', [postId], (err, result) => {
       if (err) {
         console.error('Error fetching replies:', err);
         res.status(500).send('Error fetching replies');
@@ -335,7 +335,7 @@ app.get("/market_posts", (req, res) => {
 
   app.get('/market_posts/:postId/replies', (req, res) => {
     const postId = req.params.postId;
-    db.query('SELECT market_replies.reply_id, market_replies.content, market_replies.user_id, market_replies.created_time, market_replies.updated_time, market_replies.post_id, users.user_name FROM market_replies INNER JOIN users ON market_replies.user_id = users.user_id WHERE market_replies.post_id = ?', [postId], (err, result) => {
+    db.query('SELECT market_replies.reply_id, market_replies.content, market_replies.user_id, market_replies.created_time, market_replies.updated_time, market_replies.post_id, users.user_name FROM market_replies INNER JOIN users ON market_replies.user_id = users.user_id WHERE market_replies.post_id = ? ORDER BY market_replies.created_time ASC', [postId], (err, result) => {
       if (err) {
         console.error('Error fetching replies:', err);
         res.status(500).send('Error fetching replies');

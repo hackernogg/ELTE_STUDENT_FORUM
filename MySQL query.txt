@@ -69,6 +69,22 @@ CREATE TABLE admins (
 
 INSERT INTO admins (user_id) VALUES ('admin');
 
+INSERT INTO post_category (category_type) VALUES
+  ('Studies'),
+  ('Tips'),
+  ('Events'),
+  ('Games'),
+  ('Others');
+
+
+INSERT INTO market_category (category_type) VALUES
+  ('Electronics'),
+  ('Books'),
+  ('Clothing'),
+  ('Furniture'),
+  ('Instruments'),
+  ('Others');
+
 pm2 stop all
 pm2 restart index.js
 
