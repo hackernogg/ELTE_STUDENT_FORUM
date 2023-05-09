@@ -12,11 +12,9 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 function App() {
   const [loginStatus, setloginStatus] = useState("");
   const [username, setUsername] = useState("");
-  const [userId, setUserId] = useState(null);
-  const handleChildData = (data1,data2,data3) => {
+  const handleChildData = (data1,data2) => {
     setloginStatus(data1);
     setUsername(data2);
-    setUserId(data3);
   };
   return (
     <Router>

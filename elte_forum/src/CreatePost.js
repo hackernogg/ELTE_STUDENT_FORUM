@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Axios from 'axios';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
@@ -10,9 +11,10 @@ const CreatePost = () => {
   const [postType, setPostType] = useState('post');
   const [category, setCategory] = useState(1);
   const [categories, setCategories] = useState([]);
+  const [errorMsg, setErrorMsg] = useState("");
   const storedUserid = localStorage.getItem("loggedInUserid");
   const quillRef = useRef();
-  console.log(category);
+  const navigate = useNavigate();
 
 
   const handleImageUpload = () => {
@@ -32,7 +34,7 @@ const CreatePost = () => {
           editor.insertEmbed(range.index, 'image', url);
         })
         .catch((error) => {
-          console.error('Error uploading image:', error);
+          setErrorMsg('Error uploading image:', error);
         });
     };
     input.click();
@@ -51,7 +53,7 @@ const CreatePost = () => {
         setCategories(response.data);
       })
       .catch((error) => {
-        console.error('Error fetching categories:', error);
+        setErrorMsg('Error fetching categories:', error);
       });
     } else if (postType === "market") {
       Axios.get('http://localhost:3001/market_categories')
@@ -59,7 +61,7 @@ const CreatePost = () => {
         setCategories(response.data);
       })
       .catch((error) => {
-        console.error('Error fetching categories:', error);
+        setErrorMsg('Error fetching categories:', error);
       });
     }
 
@@ -100,10 +102,13 @@ const CreatePost = () => {
         user_id: storedUserid,
       })
         .then((response) => {
-          console.log(response);
+          sessionStorage.setItem('selectedCategory', "my-posts");
+          sessionStorage.setItem('sortBy', "newest");
+          sessionStorage.setItem('pageNumber', 0);
+          navigate("/");
         })
         .catch((error) => {
-          console.error('Error creating post:', error);
+          setErrorMsg('Error creating post:', error);
         });
     } else if (postType === "market") {
       Axios.post('http://localhost:3001/market_createPost', {
@@ -114,10 +119,13 @@ const CreatePost = () => {
         user_id: storedUserid,
       })
         .then((response) => {
-          console.log(response);
+          sessionStorage.setItem('market_selectedCategory', "my-posts");
+          sessionStorage.setItem('market_sortBy', "newest");
+          sessionStorage.setItem('market_pageNumber', 0);
+          navigate("/market");
         })
         .catch((error) => {
-          console.error('Error creating post:', error);
+          setErrorMsg('Error creating post:', error);
         });
     }
 
@@ -126,32 +134,43 @@ const CreatePost = () => {
   return (
     <div className="create-post">
       <h2>Create a new post</h2>
+      <div className='create-post-filter'>
+        <div>
+          <label>Type: </label>
+          <select value={postType} onChange={(e) => setPostType(e.target.value)} className="sort-button">
+            <option value="post">Post</option>
+            <option value="market">Market</option>
+          </select>
+        </div>
+        <div>
+          <label>Category: </label>
+          <select value={category} onChange={(e) => setCategory(e.target.value)} className="sort-button">
+            {categories.map((category) => (
+              <option key={category.category_id} value={category.category_id}>
+                {category.category_type}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
       <form onSubmit={handleSubmit}>
-        <label>Title:</label>
-        <input type="text" required value={title} onChange={(e) => setTitle(e.target.value)} />
+        <input type="text" placeholder="Title..." required value={title} onChange={(e) => setTitle(e.target.value)} />
         {postType === "market" && (
           <>
-            <label>Price (HUF):</label>
-            <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} />
+            <input type="number" placeholder="Price(HUF)..." required value={price} onChange={(e) => setPrice(e.target.value)} />
           </>
         )}
-        <label>Content:</label>
-        <ReactQuill theme="snow" value={content} onChange={setContent} modules={modules} ref={quillRef} />
-        <label>Post Type:</label>
-        <select value={postType} onChange={(e) => setPostType(e.target.value)}>
-          <option value="post">Post</option>
-          <option value="market">Market</option>
-        </select>
-        <label>Category:</label>
-        <select value={category} onChange={(e) => setCategory(e.target.value)}>
-          {categories.map((category) => (
-            <option key={category.category_id} value={category.category_id}>
-              {category.category_type}
-            </option>
-          ))}
-        </select>
-        <button type="submit">Create Post</button>
+        <div className="quill-box">
+          <ReactQuill theme="snow" placeholder="Content..." value={content} onChange={setContent} modules={modules} ref={quillRef} />
+        </div>
+        <button type="submit" className='setting-button'>Create Post</button>
       </form>
+      {errorMsg && (
+        <div className='error-msg'>
+          <h3>{errorMsg}</h3>
+        </div>
+      )}
     </div>
   );
 };

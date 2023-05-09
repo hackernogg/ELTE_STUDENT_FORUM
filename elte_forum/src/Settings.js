@@ -9,11 +9,12 @@ const Settings = () =>{
     const [confirmPassword, setConfirmPassword] = useState('');
     const storedUserName = localStorage.getItem("loggedInUsername");
     const storedUserid = localStorage.getItem("loggedInUserid");
+    const [errorMsg, setErrorMsg] = useState('');
 
     const handleNameSubmit = (e) => {
         e.preventDefault();
         if ( !username ) {
-            console.error('All fields must be filled in');
+            setErrorMsg('All fields must be filled in');
             return;
           }
         Axios.post("http://localhost:3001/changeName", {
@@ -22,7 +23,6 @@ const Settings = () =>{
         })
           .then((response) => {
             if (response.data.message) {
-              console.log(response.data.message);
               localStorage.setItem("loggedInUsername",username);
               window.location.reload();
             } else {
@@ -30,7 +30,7 @@ const Settings = () =>{
             }
           })
           .catch((error) => {
-            console.error('Error updating username:', error);
+            setErrorMsg('Error updating username:', error);
           });
       };
 
@@ -39,12 +39,12 @@ const Settings = () =>{
       
         // Validate input values and handle errors
         if (!currentPassword || !newPassword || !confirmPassword) {
-          console.error('All fields must be filled in');
+          setErrorMsg('All fields must be filled in');
           return;
         }
       
         if (newPassword !== confirmPassword) {
-          console.error('New password and confirm password do not match');
+          setErrorMsg('New password and confirm password do not match');
           return;
         }
       
@@ -62,12 +62,12 @@ const Settings = () =>{
                     localStorage.removeItem("isAdmin");
                     window.location.href = "/";
                 } else{
-                    console.error(response.data.message);
+                  setErrorMsg(response.data.message);
                 }
             }
           })
           .catch((error) => {
-            console.error('Error updating password:', error);
+            setErrorMsg('Error updating password:', error);
           });
       };
 
@@ -76,47 +76,58 @@ const Settings = () =>{
         <h2>Settings</h2>
         <form onSubmit={handleNameSubmit}>
             <div>
-                <label htmlFor="username">New Username:</label>
                 <input
                     id="username"
                     type="text"
+                    required
+                    maxLength={21}
                     placeholder={storedUserName}
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                 />
             </div>
-            <button type="submit">Save Username</button>
+            <button type="submit" className='setting-button'>Change Username</button>
         </form>
         <form onSubmit={handlePWDSubmit}>
             <div>
-            <label htmlFor="currentPassword">Current Password:</label>
             <input
                 id="currentPassword"
                 type="password"
+                placeholder="Current Password..."
+                required
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
             />
             </div>
             <div>
-            <label htmlFor="newPassword">New Password:</label>
             <input
                 id="newPassword"
                 type="password"
+                placeholder="New Password..."
+                required
                 value={newPassword}
+                minLength={8}
                 onChange={(e) => setNewPassword(e.target.value)}
             />
             </div>
             <div>
-            <label htmlFor="confirmPassword">Confirm New Password:</label>
             <input
                 id="confirmPassword"
                 type="password"
+                placeholder="Confirm New Password..."
+                required
                 value={confirmPassword}
+                minLength={8}
                 onChange={(e) => setConfirmPassword(e.target.value)}
             />
             </div>
-            <button type="submit">Save Password</button>
+            <button type="submit" className='setting-button'>Change Password</button>
         </form>
+        {errorMsg && (
+        <div className='error-msg'>
+          <h3>{errorMsg}</h3>
+        </div>
+      )}
         </div>
     );
 }

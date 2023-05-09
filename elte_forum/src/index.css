@@ -33,7 +33,8 @@
 }
 
 input[type="text"],
-input[type="password"] {
+input[type="password"],
+input[type="number"] {
   width: 100%;
   padding: 12px 20px;
   margin: 8px 0;
@@ -56,6 +57,22 @@ input[type="password"] {
 
 .loginReg button:hover {
   background-color: #8e3e56;
+}
+.setting-button {
+  width: 100%;
+  margin: 10px auto;
+  background-color: #af4ca0;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+.setting-button:hover {
+  background-color: #8e3e56;
+}
+.error-msg {
+  text-align: right;
 }
 /* navbar */
 .navbar {
@@ -142,6 +159,7 @@ input[type="password"] {
   appearance: none; /* Remove default styling on some browsers */
   padding: 4px 8px;
   border: 1px solid #ccc;
+  font-weight: bold;
 }
 
 .category-select:hover{
@@ -159,6 +177,8 @@ input[type="password"] {
   border: 1px solid #ccc;
   cursor: pointer;
   background-color: transparent;
+  font-weight: bold;
+
 }
 
 .sort-button:hover {
@@ -245,7 +265,11 @@ input[type="password"] {
   margin: 0 10px;
   font-weight: bold;
 }
-
+/*create post*/
+.create-post-filter {
+  display: flex;
+  justify-content: space-between;
+}
 /*blog-details*/
 .post-box {
   border: 1px solid #b235f1; /* Add border */

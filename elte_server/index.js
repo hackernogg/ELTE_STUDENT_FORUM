@@ -4,6 +4,7 @@ const cors = require("cors");
 const multer = require('multer');
 const path = require('path');
 const bcrypt = require('bcrypt');
+const { v4: uuidv4 } = require('uuid');
 
 const app = express();
 const saltRounds = 10;
@@ -36,7 +37,9 @@ app.post('/register',(req, res)=>{
         (err,result)=>{
           console.log(err);
           if (err){
-            res.send({message: "This user id has already been used, please re-enter a new one."});
+            if (err.code === 'ER_DUP_ENTRY'){
+              res.send({message: "This user id has already been used, please re-enter a new one."});
+            }
           }else{
             res.send(result);
           }
@@ -533,7 +536,17 @@ app.get("/market_posts", (req, res) => {
       cb(null, 'uploads/');
     },
     filename: function (req, file, cb) {
-      cb(null, file.originalname);
+      //cb(null, file.originalname);
+      // Generate a unique identifier using UUID
+      const uniqueId = uuidv4();
+      
+      // Extract the file extension from the original file name
+      const fileExtension = file.originalname.split('.').pop();
+
+      // Append the UUID to the original file name and include the file extension
+      const uniqueFileName = `${file.originalname}-${uniqueId}.${fileExtension}`;
+
+      cb(null, uniqueFileName);
     },
   });
   

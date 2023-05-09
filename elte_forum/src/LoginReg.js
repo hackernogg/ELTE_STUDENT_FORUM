@@ -5,6 +5,7 @@ const LoginReg = (props) => {
   const [useridReg, setUseridReg] = useState("");
   const [usernameReg, setUsernameReg] = useState("");
   const [passwordReg, setPasswordReg] = useState("");
+  const [confirmPasswordReg, setConfirmPasswordReg] = useState("");
   const [regStatus, setRegStatus] = useState("");
 
   const [username, setUsername] = useState("");
@@ -18,19 +19,22 @@ const LoginReg = (props) => {
     const storedUsername = localStorage.getItem("loggedInUsername");
     const storedUserid = localStorage.getItem("loggedInUserid");
 
-    
-
     if (storedLoginStatus && storedUsername && storedUserid) {
       setLoginStatus(storedUsername);
       setUsername(storedUsername);
       setUserid(storedUserid);
     }
-    props.onChildData(loginStatus, username, userid);
+    props.onChildData(loginStatus, username);
   }, [loginStatus, username, userid, props]);
 
-  const register = () => {
+  const register = (e) => {
+    e.preventDefault();
     if (!useridReg || !usernameReg || !passwordReg) {
       setRegStatus("Please enter userid, username and password.");
+      return;
+    }
+    if (passwordReg !== confirmPasswordReg) {
+      setRegStatus('Password and confirm password do not match');
       return;
     }
     Axios.post("http://localhost:3001/register", {
@@ -43,11 +47,11 @@ const LoginReg = (props) => {
       } else {
         setRegStatus("Successfully registered");
       }
-      console.log(response);
     });
   };
 
-  const login = () => {
+  const login = (e) => {
+    e.preventDefault();
     if (!userid || !password) {
       setLoginStatus("Please enter both userid and password.");
       return;
@@ -71,7 +75,6 @@ const LoginReg = (props) => {
           .then((adminResponse) => {
             if (adminResponse.data.length > 0){
               localStorage.setItem("isAdmin", true);
-              console.log(localStorage.getItem("isAdmin"));
             }
           })
           .catch((error) => {
@@ -86,56 +89,77 @@ const LoginReg = (props) => {
       <h1>Welcome to ELTE student forum</h1>
       <div className='registration'>
         <h2>Registration</h2>
-        <input
-          type="text"
-          placeholder="User ID..."
-          onChange={(e) => {
-            setUseridReg(e.target.value);
-          }}
-        />
-        <input
-          type="text"
-          placeholder="User name..."
-          onChange={(e) => {
-            setUsernameReg(e.target.value);
-          }}
-        />
-        <input
-          type="text"
-          placeholder="Password..."
-          onChange={(e) => {
-            setPasswordReg(e.target.value);
-          }}
-        />
-        <button onClick={register}> Register </button>
+        <form onSubmit={(e) => register(e)}>
+          <input
+            type="text"
+            required
+            maxLength={21}
+            placeholder="User ID..."
+            onChange={(e) => {
+              setUseridReg(e.target.value);
+            }}
+          />
+          <input
+            type="text"
+            required
+            maxLength={21}
+            placeholder="User name..."
+            onChange={(e) => {
+              setUsernameReg(e.target.value);
+            }}
+          />
+          <input
+            type="password"
+            required
+            minLength={8}
+            placeholder="Password..."
+            onChange={(e) => {
+              setPasswordReg(e.target.value);
+            }}
+          />
+          <input
+            type="password"
+            required
+            minLength={8}
+            placeholder="Confirm Password..."
+            onChange={(e) => {
+              setConfirmPasswordReg(e.target.value);
+            }}
+          />
+          <button type="submit"> Register </button>
+        </form>
       </div>
       {regStatus && (
-        <div>
+        <div className='error-msg'> 
           <h3>{regStatus}</h3>
         </div>
       )}
 
       <div className='login'>
         <h2>Login</h2>
-        <input
-          type="text"
-          placeholder="User ID..."
-          onChange={(e) => {
-            setUserid(e.target.value);
-          }}
-        />
-        <input
-          type="password"
-          placeholder="Password..."
-          onChange={(e) => {
-            setPassword(e.target.value);
-          }}
-        />
-        <button onClick={login}> Login </button>
+        <form onSubmit={(e) => {login(e)}}>
+          <input
+            type="text"
+            placeholder="User ID..."
+            required
+            onChange={(e) => {
+              setUserid(e.target.value);
+            }}
+          />
+          <input
+            type="password"
+            placeholder="Password..."
+            required
+            onChange={(e) => {
+              setPassword(e.target.value);
+            }}
+          />
+          <button type="submit"> Login </button>
+        </form>
       </div>
       {loginStatus && (
-        <div>
-          <h1>{loginStatus}</h1>
+        <div className='error-msg'>
+          <h3>{loginStatus}</h3>
         </div>
       )}
     </div>
