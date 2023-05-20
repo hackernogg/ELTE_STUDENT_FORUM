@@ -69,8 +69,7 @@ const LoginReg = (props) => {
         localStorage.setItem("isAdmin", false);
         localStorage.setItem("loggedInUsername", response.data[0].user_name);
         localStorage.setItem("loggedInUserid", response.data[0].user_id);
-        props.onChildData(response.data[0].user_name, response.data[0].user_name, response.data[0].user_id); // Pass the user_id as the third argument
-        // Check if the user is an admin
+        props.onChildData(response.data[0].user_name, response.data[0].user_name, response.data[0].user_id);
         Axios.get(`http://localhost:3001/admins/${userid}`)
           .then((adminResponse) => {
             if (adminResponse.data.length > 0){
@@ -112,7 +111,7 @@ const LoginReg = (props) => {
             type="password"
             required
             minLength={8}
-            placeholder="Password..."
+            placeholder="Password(At least 8 characters)..."
             onChange={(e) => {
               setPasswordReg(e.target.value);
             }}

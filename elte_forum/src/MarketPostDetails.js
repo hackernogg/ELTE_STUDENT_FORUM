@@ -6,9 +6,9 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
 
-const BlogDetails = () => {
+const PostDetails = () => {
   const { id } = useParams();
-  const [blog, setBlog] = useState(null);
+  const [post, setPost] = useState(null);
 
   const storedUsername = localStorage.getItem("loggedInUsername");
   const storedUserid = localStorage.getItem("loggedInUserid");
@@ -73,7 +73,7 @@ const BlogDetails = () => {
         if (!response.data) {
           navigate("/");
         } else {
-          setBlog(response.data);
+          setPost(response.data);
         }
       })
       .catch((error) => {
@@ -112,7 +112,7 @@ const BlogDetails = () => {
     // Send a request to the server to remove the post with the given postId and userId
     Axios.delete(`http://localhost:3001/market_posts/${postId}`)
       .then((response) => {
-        // Handle any necessary update or refresh of the blog list
+        // Handle any necessary update or refresh of the post list
         navigate("/market");
         
       })
@@ -134,25 +134,25 @@ const BlogDetails = () => {
   };
 
   return (
-    <div className="blog-details">
-      {blog ? (
+    <div className="post-details">
+      {post ? (
         <>
           <div className="post-box">
             <div className="post-user">
-              <p className="user-box">{blog.user_name}</p>
+              <p className="user-box">{post.user_name}</p>
               <div className="post-remove">
-                {( isAdmin || storedUserid === blog.user_id ) && (
-                  <button onClick={() => handleRemovePost(blog.post_id)}>
+                {( isAdmin || storedUserid === post.user_id ) && (
+                  <button onClick={() => handleRemovePost(post.post_id)}>
                     ✘
                   </button>
                 )}
-                <p>{new Date(blog.created_time).toLocaleString()}</p>
+                <p>{new Date(post.created_time).toLocaleString()}</p>
               </div>
             </div>
-            <div className="blog-content">
-              <h2 className="title">{blog.title}</h2>
-              <h3>{blog.price} HUF</h3>
-              <div dangerouslySetInnerHTML={{ __html: blog.content }}></div>
+            <div className="post-content">
+              <h2 className="title">{post.title}</h2>
+              <h3>{post.price} HUF</h3>
+              <div dangerouslySetInnerHTML={{ __html: post.content }}></div>
             </div>
           </div>
           <form onSubmit={handleSubmit}>
@@ -183,11 +183,11 @@ const BlogDetails = () => {
               )}
             </div>
           </div>
-          <div className="blog-content" dangerouslySetInnerHTML={{ __html: reply.content }}></div>
+          <div className="post-content" dangerouslySetInnerHTML={{ __html: reply.content }}></div>
         </div>
       ))}
     </div>
   );
 };
 
-export default BlogDetails;
+export default PostDetails;

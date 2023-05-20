@@ -2,10 +2,10 @@ import Navbar from './Navbar';
 import Home from './Home';
 import LoginReg from './LoginReg';
 import React, { useState } from 'react';
-import BlogDetails from "./BlogDetails";
+import PostDetails from "./PostDetails";
 import CreatePost from './CreatePost';
 import Market from './Market';
-import MarketBlogDetails from './MarketBlogDetails';
+import MarketPostDetails from './MarketPostDetails';
 import Settings from './Settings';
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
@@ -29,10 +29,10 @@ function App() {
             <div className="content">
               <Routes>
                 <Route exact path="/" element={<Home />} />
-                <Route path="/blogs/:id" element={<BlogDetails />} />
+                <Route path="/posts/:id" element={<PostDetails />} />
                 <Route path="/createPost" element={<CreatePost />} />
                 <Route path="/Market" element={<Market />} />
-                <Route path="/market_blogs/:id" element={<MarketBlogDetails />} />
+                <Route path="/market_posts/:id" element={<MarketPostDetails />} />
                 <Route path="/settings" element={<Settings />} />
               </Routes>
             </div>

@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import BlogList from "./BlogList";
+import PostList from "./PostList";
 import Axios from "axios";
 
 const Home = () => {
-  const [blogs, setBlogs] = useState([]);
+  const [posts, setPosts] = useState([]);
   const [pageNumber, setPageNumber] = useState(parseInt(sessionStorage.getItem("pageNumber"), 10)|| 0);
   const [pageCount,setPageCount] = useState(0);
   const [postsPerPage] = useState(7);
@@ -16,7 +16,7 @@ const Home = () => {
   useEffect(() => {
     Axios.get(`http://localhost:3001/posts?page=${pageNumber}&pageSize=${postsPerPage}&category=${selectedCategory}&sort=${sortBy}&user_id=${storedUserid}&searchTitle=${searchTitle}`)
       .then((response) => {
-        setBlogs(response.data.posts); // Update to set the blogs from the 'posts' property in the response data
+        setPosts(response.data.posts); // Update to set the posts from the 'posts' property in the response data
         setPageCount(Math.max(1, Math.ceil(response.data.totalCount / postsPerPage)));
         if (pageNumber>Math.max(1, Math.ceil(response.data.totalCount / postsPerPage))-1){
           setPageNumber(Math.max(1, Math.ceil(response.data.totalCount / postsPerPage))-1);
@@ -103,7 +103,7 @@ const Home = () => {
         </div>
         <button className="sort-button" onClick={handleSortToggle}>{sortBy}</button>
       </div>
-      <BlogList blogs={blogs} />
+      <PostList posts={posts} />
       {renderPaginationButtons()}
     </div>
   );
