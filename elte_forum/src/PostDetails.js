@@ -109,10 +109,8 @@ const PostDetails = () => {
   };
   
   const handleRemovePost = (postId) => {
-    // Send a request to the server to remove the post with the given postId and userId
     Axios.delete(`http://localhost:3001/posts/${postId}`)
       .then((response) => {
-        // Handle any necessary update or refresh of the post list
         navigate("/");
         
       })
@@ -156,7 +154,7 @@ const PostDetails = () => {
           </div>
           <form onSubmit={handleSubmit}>
             <div className="quill-box">
-              <ReactQuill theme="snow" value={content} onChange={setContent} modules={modules} ref={quillRef}/>
+              <ReactQuill data-testid="reply-content" theme="snow" value={content} onChange={setContent} modules={modules} ref={quillRef}/>
             </div>
             <button className="quill-submit" type="submit">Reply</button>
           </form>

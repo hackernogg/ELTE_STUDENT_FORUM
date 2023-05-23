@@ -1,9 +1,15 @@
+CREATE DATABASE elte_forum_db;
+use elte_forum_db;
+
 CREATE TABLE users (
     user_id VARCHAR(255) PRIMARY KEY,
     user_name VARCHAR(255) NOT NULL,
     user_pwd VARCHAR(255) NOT NULL
 );
 
+CREATE TABLE admins (
+  user_id VARCHAR(255) NOT NULL PRIMARY KEY
+);
 
 CREATE TABLE posts (
   post_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -63,9 +69,6 @@ CREATE TABLE market_replies (
   FOREIGN KEY (post_id) REFERENCES market_posts(post_id)
 );
 
-CREATE TABLE admins (
-  user_id VARCHAR(255) NOT NULL PRIMARY KEY
-);
 
 INSERT INTO admins (user_id) VALUES ('admin');
 
@@ -98,3 +101,63 @@ sudo systemctl restart nginx
 SELECT replies.reply_id, replies.content, replies.user_id, replies.created_time, replies.updated_time, users.user_name
 FROM replies
 INNER JOIN users ON replies.user_id = users.user_id;
+
+
+
+TABLE users {
+    user_id VARCHAR(255)
+    user_name VARCHAR(255)
+    user_pwd VARCHAR(255)
+}
+
+TABLE posts {
+  post_id INT
+  title VARCHAR(255)
+  content TEXT
+  user_id VARCHAR(255)
+  category_id INT
+  created_time TIMESTAMP
+  updated_time TIMESTAMP
+}
+
+TABLE market_posts {
+  post_id INT
+  title VARCHAR(255)
+  content TEXT
+  user_id VARCHAR(255)
+  category_id INT
+  price INT
+  created_time TIMESTAMP
+  updated_time TIMESTAMP
+}
+
+TABLE post_category {
+  category_id INT
+  category_type VARCHAR(255)
+}
+
+TABLE market_category {
+  category_id INT
+  category_type VARCHAR(255)
+}
+
+TABLE replies {
+  reply_id INT
+  content TEXT
+  user_id VARCHAR(255)
+  created_time TIMESTAMP
+  updated_time TIMESTAMP
+  post_id INT
+}
+
+TABLE market_replies {
+  reply_id INT
+  content TEXT
+  user_id VARCHAR(255)
+  created_time TIMESTAMP
+  updated_time TIMESTAMP 
+  post_id INT
+}
+TABLE admins {
+  user_id VARCHAR(255)
+}

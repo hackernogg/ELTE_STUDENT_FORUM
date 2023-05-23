@@ -128,7 +128,6 @@ const CreatePost = () => {
           setErrorMsg('Error creating post:', error);
         });
     }
-
   };
 
   return (

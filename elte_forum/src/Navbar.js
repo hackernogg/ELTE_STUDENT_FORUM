@@ -4,10 +4,11 @@ import { Link } from 'react-router-dom';
 
 const Navbar = () => {
     const [username, setUsername] = useState(localStorage.getItem("loggedInUsername"));
+    const loggedInUsername = localStorage.getItem("loggedInUsername");
 
     useEffect(() => {
-        setUsername(localStorage.getItem("loggedInUsername"));
-      }, [localStorage.getItem("loggedInUsername")]);
+      setUsername(loggedInUsername);
+    }, [loggedInUsername]);
 
     const logout = () => {
         localStorage.removeItem("isLoggedIn");

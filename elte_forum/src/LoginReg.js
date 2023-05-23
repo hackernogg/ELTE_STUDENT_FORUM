@@ -97,6 +97,7 @@ const LoginReg = (props) => {
             onChange={(e) => {
               setUseridReg(e.target.value);
             }}
+            data-testid="userid-reg"
           />
           <input
             type="text"
@@ -106,6 +107,7 @@ const LoginReg = (props) => {
             onChange={(e) => {
               setUsernameReg(e.target.value);
             }}
+            data-testid="username-reg"
           />
           <input
             type="password"
@@ -115,6 +117,7 @@ const LoginReg = (props) => {
             onChange={(e) => {
               setPasswordReg(e.target.value);
             }}
+            data-testid="userpwd-reg"
           />
           <input
             type="password"
@@ -124,8 +127,9 @@ const LoginReg = (props) => {
             onChange={(e) => {
               setConfirmPasswordReg(e.target.value);
             }}
+            data-testid="usercpwd-reg"
           />
-          <button type="submit"> Register </button>
+          <button type="submit" data-testid="register-button"> Register </button>
         </form>
       </div>
       {regStatus && (
@@ -144,6 +148,7 @@ const LoginReg = (props) => {
             onChange={(e) => {
               setUserid(e.target.value);
             }}
+            data-testid="userid-login"
           />
           <input
             type="password"
@@ -152,8 +157,9 @@ const LoginReg = (props) => {
             onChange={(e) => {
               setPassword(e.target.value);
             }}
+            data-testid="userpwd-login"
           />
-          <button type="submit"> Login </button>
+          <button type="submit" data-testid="login-button"> Login </button>
         </form>
       </div>
       {loginStatus && (

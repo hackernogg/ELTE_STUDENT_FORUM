@@ -488,9 +488,6 @@ app.get("/market_posts", (req, res) => {
   //remove post
   app.delete('/posts/:postId', (req, res) => {
     const postId = req.params.postId;
-  
- 
-          // User is authorized, proceed with removing the post and its replies
           db.query('DELETE FROM replies WHERE post_id = ?', [postId], (err, result) => {
             if (err) {
               console.error('Error removing replies:', err);
@@ -536,16 +533,9 @@ app.get("/market_posts", (req, res) => {
       cb(null, 'uploads/');
     },
     filename: function (req, file, cb) {
-      //cb(null, file.originalname);
-      // Generate a unique identifier using UUID
       const uniqueId = uuidv4();
-      
-      // Extract the file extension from the original file name
       const fileExtension = file.originalname.split('.').pop();
-
-      // Append the UUID to the original file name and include the file extension
-      const uniqueFileName = `${file.originalname}-${uniqueId}.${fileExtension}`;
-
+      const uniqueFileName = `${file.originalname}-${uniqueId}.${fileExtension}`
       cb(null, uniqueFileName);
     },
   });
@@ -557,9 +547,6 @@ app.get("/market_posts", (req, res) => {
     if (!file) {
       return res.status(400).send('No file uploaded.');
     }
-    // Here you can perform any additional processing on the uploaded image,
-    // such as resizing, cropping, or compressing.
-    // Then return the URL where the image can be accessed.
     res.json({ url: `http://localhost:3001/${file.path}` });
   });
   

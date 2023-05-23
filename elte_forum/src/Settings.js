@@ -36,19 +36,14 @@ const Settings = () =>{
 
       const handlePWDSubmit = (e) => {
         e.preventDefault();
-      
-        // Validate input values and handle errors
         if (!currentPassword || !newPassword || !confirmPassword) {
           setErrorMsg('All fields must be filled in');
           return;
         }
-      
         if (newPassword !== confirmPassword) {
           setErrorMsg('New password and confirm password do not match');
           return;
         }
-      
-        // Verify the user's current password and update it with the new password
         Axios.post("http://localhost:3001/verifyAndUpdatePassword", {
           userid: storedUserid,
           currentPassword: currentPassword,
@@ -84,9 +79,10 @@ const Settings = () =>{
                     placeholder={storedUserName}
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
+                    data-testid="username-change"
                 />
             </div>
-            <button type="submit" className='setting-button'>Change Username</button>
+            <button type="submit" className='setting-button' data-testid="username-change-button">Change Username</button>
         </form>
         <form onSubmit={handlePWDSubmit}>
             <div>
