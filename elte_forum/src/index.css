@@ -346,6 +346,9 @@ input[type="number"] {
   border: 1px solid #ddd;
   overflow: hidden;
 }
+.quill-box .ql-editor {
+  min-height: 130px; /* 4 lines * 20px each */
+}
 .quill-submit{
   width: 100%;
   margin: 10px auto;

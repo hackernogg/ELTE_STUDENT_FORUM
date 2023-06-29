@@ -75,9 +75,7 @@ const CreatePost = () => {
           [{ size: [] }],
           ['bold', 'italic', 'underline', 'strike', 'blockquote'],
           [{ list: 'ordered' }, { list: 'bullet' }],
-          ['link', 'image'],
-          ['clean'],
-          ['code-block'],
+          ['image'],
         ],
         handlers: {
           image: handleImageUpload,

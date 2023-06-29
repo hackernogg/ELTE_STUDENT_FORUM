@@ -52,9 +52,7 @@ const PostDetails = () => {
           [{ size: [] }],
           ['bold', 'italic', 'underline', 'strike', 'blockquote'],
           [{ list: 'ordered' }, { list: 'bullet' }],
-          ['link', 'image'],
-          ['clean'],
-          ['code-block'],
+          ['image'],
         ],
         handlers: {
           image: handleImageUpload,
@@ -94,18 +92,24 @@ const PostDetails = () => {
   }, [id]);
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    Axios.post(`http://localhost:3001/posts/${id}/replies`, {
-      content: content,
-      userId: storedUserid,
-      userName: storedUsername
-    })
-      .then((response) => {
-        window.location.reload()
+    if (content.trim() !== ''){
+      e.preventDefault();
+      Axios.post(`http://localhost:3001/posts/${id}/replies`, {
+        content: content,
+        userId: storedUserid,
+        userName: storedUsername
       })
-      .catch((error) => {
-        setErrorMsg('Error creating post:', error);
-      });
+        .then((response) => {
+          window.location.reload()
+        })
+        .catch((error) => {
+          setErrorMsg('Error replying post:', error);
+          if (error.response.status === 404){
+            navigate("/");
+          }
+        });
+    }
+
   };
   
   const handleRemovePost = (postId) => {

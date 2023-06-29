@@ -52,9 +52,7 @@ const PostDetails = () => {
           [{ size: [] }],
           ['bold', 'italic', 'underline', 'strike', 'blockquote'],
           [{ list: 'ordered' }, { list: 'bullet' }],
-          ['link', 'image'],
-          ['clean'],
-          ['code-block'],
+          ['image'],
         ],
         handlers: {
           image: handleImageUpload,
@@ -94,19 +92,24 @@ const PostDetails = () => {
   }, [id]);
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    // Submit the post to the server
-    Axios.post(`http://localhost:3001/market_posts/${id}/replies`, {
-      content: content,
-      userId: storedUserid,
-      userName: storedUsername
-    })
-      .then((response) => {
-        window.location.reload()
+    if (content.trim() !== ''){
+      e.preventDefault();
+      // Submit the post to the server
+      Axios.post(`http://localhost:3001/market_posts/${id}/replies`, {
+        content: content,
+        userId: storedUserid,
+        userName: storedUsername
       })
-      .catch((error) => {
-        setErrorMsg('Error creating post:', error);
-      });
+        .then((response) => {
+          window.location.reload()
+        })
+        .catch((error) => {
+          setErrorMsg('Error creating post:', error);
+          if (error.response.status === 404){
+            navigate("/market");
+          }
+        });
+    }
   };
   const handleRemovePost = (postId) => {
     // Send a request to the server to remove the post with the given postId and userId
